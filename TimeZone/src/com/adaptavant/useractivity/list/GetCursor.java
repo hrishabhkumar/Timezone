@@ -20,8 +20,9 @@ public class GetCursor {
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();
 		Query query = pm.newQuery(TimezoneJDO.class);
 		query.setRange(0, range);
+		@SuppressWarnings("unchecked")
 		Cursor cursor1=JDOCursorHelper.getCursor((List<TimezoneJDO>)query.execute());
-		query.setResult ("distinct country");
+		
 		if(cursorString!=null){
 			Cursor cursor=Cursor.fromWebSafeString(cursorString);
 			Map<String,Object> extnMap=new HashMap<String, Object>();

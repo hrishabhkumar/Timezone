@@ -16,13 +16,13 @@ $(document).ready(function(){
 		cache: false,
 		processData:false,
 		success: function(data){
-			
+		
 			var listdata=data.list;
 			
 			if(listdata.length!=0){
 				var output='<option selected=true>select Country</option>';
 				for (var i in listdata) {
-					output+='<option value="'+listdata[i].c_name+'>'+listdata[i].c_name+'</option>';
+					output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
 				}
 				$('#country').html(output);
 			}
@@ -57,7 +57,7 @@ $(document).ready(function(){
 						var output='<option selected=true>select State</option>';
 					
 						for (var i in listdata) {
-							output+='<option value="'+listdata[i].st_name+'>'+listdata[i].st_name+'</option>';
+							output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
 						}
 						$('#state').html(output);
 					}
@@ -93,7 +93,7 @@ $(document).ready(function(){
 					if(listdata.length!=0){
 						var output='<option selected=true>select City</option>';		
 						for (var i in listdata) {
-							output+='<option value="'+listdata[i].ct_name+'>'+listdata[i].ct_name+'</option>';
+							output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
 						}
 						$('#city').html(output);
 					}

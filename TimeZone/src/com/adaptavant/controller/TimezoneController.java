@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -12,6 +13,7 @@ import javax.jdo.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -165,18 +167,19 @@ public class TimezoneController {
 			DataListProvider dlp=new DataListProvider();
 			if(jsonObject.get("required").toString().equals("country")){
 				System.out.println("inside country");
-				String str=dlp.getCountryList();
-				logger.info(str);
-				jsonObject=(JSONObject) parser.parse(str);
-				System.out.println(jsonObject.toJSONString());
+				JSONArray str=dlp.getCountryList();
+				jsonObject=new JSONObject();
+				jsonObject.put("list", str);
+				System.out.println(jsonObject.get("list").toString());
 				return jsonObject.toJSONString();
 			}
 			else if(jsonObject.get("required").toString().equals("state")){
 				System.out.println("inside state");
 				String country=(String) jsonObject.get("country");
-				String str=dlp.getStateList(country);
-				logger.info(str);
-				jsonObject=(JSONObject) parser.parse(str);
+				JSONArray state=dlp.getStateList(country);
+				logger.info(state.toJSONString());
+				jsonObject=new JSONObject();
+				jsonObject.put("list", state);
 				System.out.println(jsonObject.toJSONString());
 				return jsonObject.toJSONString();
 			}
@@ -184,9 +187,10 @@ public class TimezoneController {
 				System.out.println("inside City");
 				String country=(String) jsonObject.get("country");
 				String state=(String) jsonObject.get("state");
-				String str=dlp.getCityList(country, state);
-				logger.info(str);
-				jsonObject=(JSONObject) parser.parse(str);
+				JSONArray city=dlp.getCityList(country, state);
+				logger.info(city.toJSONString());
+				jsonObject=new JSONObject();
+				jsonObject.put("list", city);
 				System.out.println(jsonObject.toJSONString());
 				return jsonObject.toJSONString();
 			}

@@ -3,62 +3,56 @@ package com.adaptavant.useractivity.list;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
+import org.json.simple.JSONArray;
 
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.timezone.TimezoneJDO;
 import com.adaptavant.timezone.services.MCacheService;
 import com.google.appengine.api.datastore.Cursor;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.datanucleus.query.JDOCursorHelper;
 
 
 public class DataListProvider {
-	Queue queue = QueueFactory.getDefaultQueue();
-	public String getCountryList(){
+	JSONArray array=new JSONArray();
+	@SuppressWarnings("unchecked")
+	public JSONArray getCountryList(){
 		String keyString="getCountryList";
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
 		if(MCacheService.get(keyString)!=null){
 			System.out.println("inside memcache");
-			return (String) MCacheService.get(keyString);
+			return (JSONArray) MCacheService.get(keyString);
 		}
 		else{
 			Query query = pm.newQuery(TimezoneJDO.class);
-			query.setRange(0, 1000);
-			Cursor cursor = JDOCursorHelper.getCursor((List<TimezoneJDO>)query.execute());
-			query.setResult ("distinct country");
-			
+			query.setRange(0, 1000);			
 			System.out.println(query.toString());
-			String cursorString;
+			
 			try {
-			  List<?> results = (List<?>)query.execute ();
-			  cursorString=cursor.toWebSafeString();
+			  @SuppressWarnings("unchecked")
+			List<TimezoneJDO> results = (List<TimezoneJDO>)query.execute ();
+//			  Cursor cursor = JDOCursorHelper.getCursor(results);
+//			  String cursorString=cursor.toWebSafeString();
 			  System.out.println(query.execute());
 			  if (!results.isEmpty()) {
-				  Iterator<?> iter = results.iterator();
-				  StringBuilder sb=new StringBuilder();
-				  String str;
-				  while (iter.hasNext()) {
-				      String country = (String) iter.next();
-				      country=country.replace('\"', ' ');
-				      sb=sb.append("{\"c_name\":\""+country+"\"},");
+				  Collection<String> country=new TreeSet<String>();
+				  for (TimezoneJDO tj: results) {
+				      country.add(tj.getCountry());
 				  }	
-				  GetCursor gc=new GetCursor();
-				  str =gc.getCountryList(cursorString, 1000);
-				 
-					  sb=sb.append(str);
-					  System.out.println(str);
 				  
-				  str="{\"list\":["+sb.toString()+"]}";			  
-				  MCacheService.set(keyString, str);
-				  return str;
+				  array=new JSONArray();
+				  array.addAll(country);
+				  MCacheService.set(keyString, array);
+				  System.out.println(array.toJSONString());
+				  return array;
 				  
 			  } 
 			  else {
-			    return "{\"list\": [\"data not found.\"]}";
+			    return null;
 			  }
 			} 
 			finally {
@@ -66,14 +60,16 @@ public class DataListProvider {
 			}
 		}
 		
+		
 	}
 	
-	public String getStateList(String country){
+	@SuppressWarnings("unchecked")
+	public JSONArray getStateList(String country){
 		String keyString="getStateList"+country;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
 		if(MCacheService.get(keyString)!=null){
 			System.out.println("inside memcache");
-			return (String) MCacheService.get(keyString);
+			return (JSONArray) MCacheService.get(keyString);
 		}
 		else{
 		Query query = pm.newQuery(TimezoneJDO.class, "country == '"+country+"'");
@@ -85,22 +81,18 @@ public class DataListProvider {
 		  Collection<?> results = (Collection<?>)query.execute (); 
 		  System.out.println(query.execute());
 		  if (!results.isEmpty()) {
-			  Iterator<?> iter = results.iterator();
 			 
-			  StringBuilder sb=new StringBuilder();
-			  String str;
-			  while (iter.hasNext()) {
-			      String state = (String) iter.next();
-			      state=state.replace('\"', ' ');
-			    	 sb=sb.append("{\"st_name\":\""+state+"\"},");
-			  }
-			  str="{\"list\":["+sb.toString()+"]}";
+			  Collection<String> state=new TreeSet<String>();
+			  state.addAll((Collection<? extends String>) results);
 			  
-				MCacheService.set(keyString, str);
-			  return str;
+			  array=new JSONArray();
+			  array.addAll(state);
+				MCacheService.set(keyString, array);
+			  return array;
 			  
 		  } else {
-		    return "{\"list\": [\"data not found.\"]}";
+			  
+		    return null;
 		  }
 		} finally {
 		  query.closeAll();
@@ -109,12 +101,13 @@ public class DataListProvider {
 		
 	}
 	
-	public String getCityList(String country, String state){
+	@SuppressWarnings("unchecked")
+	public JSONArray getCityList(String country, String state){
 		String keyString="getCityList"+country+"and"+state;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
 		if(MCacheService.get(keyString)!=null){
 			System.out.println("inside memcache");
-			return (String) MCacheService.get(keyString);
+			return (JSONArray) MCacheService.get(keyString);
 		}
 		else{
 		Query query = pm.newQuery(TimezoneJDO.class, "country == '"+country+"'&& state == '"+state+"'");
@@ -126,22 +119,17 @@ public class DataListProvider {
 		  Collection<?> results = (Collection<?>)query.execute (); 
 		  System.out.println(query.execute());
 		  if (!results.isEmpty()) {
-			  Iterator<?> iter = results.iterator();
-			 
-			  StringBuilder sb=new StringBuilder();
-			  String str;
-			  while (iter.hasNext()) {
-			      String city = (String) iter.next();
-			      city=city.replace('\"', ' ');
-			    	 sb=sb.append("{\"ct_name\":\""+city+"\"},");
-			  }
-			  str="{\"list\":["+sb.toString()+"]}";
+			  Collection<String> city=new TreeSet<String>();
 			  
-				MCacheService.set(keyString, str);
-			  return str;
+			  city.addAll((Collection<? extends String>) results);
+			  
+			  array=new JSONArray();
+			  array.addAll(city);
+				MCacheService.set(keyString, array);
+			  return array;
 			  
 		  } else {
-		    return "{\"list\": [\"data not found.\"]}";
+		    return null;
 		  }
 		} finally {
 		  query.closeAll();

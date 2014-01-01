@@ -34,6 +34,7 @@ public class Timezone {
 		Query query = pm.newQuery(TimezoneJDO.class,
                 " city == '"+city+"' && state == '" +
 				state+"' && country == '"+country+"'");
+		query.setRange(0,1);
 		System.out.println(query.toString());
 		try {
 		  @SuppressWarnings("unchecked")
