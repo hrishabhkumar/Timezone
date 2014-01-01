@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<queue-entries>
+<!--Set the number of max concurrent requests to 10-->
+  <queue>
+    <name>FetchQuery</name>
+    <rate>20/s</rate>
+    <bucket-size>40</bucket-size>
+    <max-concurrent-requests>10</max-concurrent-requests>
+    <task-retry-limit>0</task-retry-limit>
+  </queue>
+</queue-entries>
