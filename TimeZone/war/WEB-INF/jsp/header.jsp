@@ -7,7 +7,7 @@
 			    <span class="icon-bar"></span>
 			    <span class="icon-bar"></span>
 		    </button>
-		    <a href="/" class="navbar-brand">Spring By Hrishabh</a>
+		    <a href="/" class="navbar-brand">Timezone-Adaptavant</a>
 		    <div class="collapse navbar-collapse navHeaderCollapse">
 			    <ul class="nav navbar-nav navbar-right">
 			    	<li class="active"><a href="/home.html">Home</a></li>

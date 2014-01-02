@@ -37,7 +37,7 @@ public class TimezoneJDO {
 	@Persistent
 	private String state;
 	
-	@Persistent
+	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private String city;
 	
 	@Persistent

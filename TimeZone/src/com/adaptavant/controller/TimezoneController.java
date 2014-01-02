@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,7 +26,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.timezone.TimezoneJDO;
 import com.adaptavant.timezone.Timezone;
+import com.adaptavant.timezone.services.MCacheService;
 import com.adaptavant.useractivity.list.DataListProvider;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
+
 
 @Controller
 
@@ -97,18 +102,18 @@ public class TimezoneController {
 		BufferedReader br = null;
 		String line=null;
 		String str="db.txt";
-		
-		PersistenceManager pm = PMF.getPMF().getPersistenceManager();
-		Query query = pm.newQuery(TimezoneJDO.class);
-		query.deletePersistentAll();
+		PersistenceManager pm1 = PMF.getPMF().getPersistenceManager();
+		TimezoneJDO time;
+		Collection<TimezoneJDO> timeobj=new ArrayList<TimezoneJDO>();
 			try{
 				br=new BufferedReader(new FileReader(str));
 				System.out.println("Here is the count of words in file: ");
 				
 				while((line=br.readLine())!=null){	
-				System.out.println(line);
-				token=new StringTokenizer(line, "\t");
-				TimezoneJDO time=new TimezoneJDO();
+					
+					System.out.println(line);
+					token=new StringTokenizer(line, "\t");
+					time=new TimezoneJDO();
 				while(token.hasMoreTokens()){
 				
 					String country=token.nextToken().replace("\"", "");
@@ -131,20 +136,14 @@ public class TimezoneController {
 					time.setTimeZoneId(timeZone);
 					time.setTimeZoneName(timeZone.substring(timeZone.lastIndexOf('/')+1));
 					time.setLatitude(latitude);
-					time.setLongitude(longitude);
-					
-					
-					
-					pm.makePersistent(time);
+					time.setLongitude(longitude);					
 					
 					
 				}
-				
+				timeobj.add(time);
 				
 				}
-				pm.close();
-				resp.setContentType("text/plain");
-				resp.getWriter().println("Hello, world");
+				
 			}
 		catch(FileNotFoundException f){
 			f.printStackTrace();
@@ -152,8 +151,10 @@ public class TimezoneController {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		System.out.println("Words ===> Count");
+		finally{
+			pm1.makePersistentAll(timeobj);
+			pm1.close();
+		}
 		
 	}
 	
@@ -167,11 +168,22 @@ public class TimezoneController {
 			DataListProvider dlp=new DataListProvider();
 			if(jsonObject.get("required").toString().equals("country")){
 				System.out.println("inside country");
-				JSONArray str=dlp.getCountryList();
-				jsonObject=new JSONObject();
-				jsonObject.put("list", str);
-				System.out.println(jsonObject.get("list").toString());
-				return jsonObject.toJSONString();
+				if(MCacheService.containsKey("getCountryList")){
+					System.out.println("inside memcache");
+					JSONArray str=(JSONArray) MCacheService.get("getCountryList");
+					jsonObject=new JSONObject();
+					jsonObject.put("list", str);
+					return jsonObject.toJSONString();
+				}
+				else{
+					Queue queue=QueueFactory.getDefaultQueue();
+					queue.add(TaskOptions.Builder.withUrl("/countrylist").param("limit", "1000"));
+					JSONArray str=(JSONArray) MCacheService.get("getCountryList");
+					jsonObject=new JSONObject();
+					jsonObject.put("list", str);
+//					System.out.println(jsonObject.get("list").toString());
+					return jsonObject.toJSONString();
+				}
 			}
 			else if(jsonObject.get("required").toString().equals("state")){
 				System.out.println("inside state");
@@ -205,7 +217,37 @@ public class TimezoneController {
 			timezonejson.put("data", "data is not in proper format");
 			return timezonejson.toJSONString();
 		}
+	}
+	
+	@RequestMapping("/tasktoupload")
+	public String uploadingTask(){
 		
+		Queue queue=QueueFactory.getDefaultQueue();
+//		queue.add(TaskOptions.Builder.withUrl("/deleteall"));
+		queue.add(TaskOptions.Builder.withUrl("/upload"));
+		return "index";
+	}
+	
+	@RequestMapping("/deleteall")
+	public void deleteAll(){
+		PersistenceManager pm = PMF.getPMF().getPersistenceManager();
+		try{
+			
+			javax.jdo.Query query = pm.newQuery(TimezoneJDO.class);
+			query.deletePersistentAll();
+			
+		}
+		finally{
+			pm.close();
+		}	
+	}
+	@RequestMapping("/countrylist")
+	public void getcountrylist(HttpServletRequest req, HttpServletResponse resp){
+		int limit=Integer.parseInt(req.getParameter("limit"));
+		String curString=req.getParameter("cursorString");
+		DataListProvider dlp=new DataListProvider();
+		dlp.getCountryList(limit, curString);
 		
+		return ;
 	}
 }

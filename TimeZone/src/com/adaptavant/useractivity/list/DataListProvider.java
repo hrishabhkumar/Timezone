@@ -1,8 +1,9 @@
 package com.adaptavant.useractivity.list;
 
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import javax.jdo.PersistenceManager;
@@ -14,54 +15,62 @@ import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.timezone.TimezoneJDO;
 import com.adaptavant.timezone.services.MCacheService;
 import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.datanucleus.query.JDOCursorHelper;
 
 
 public class DataListProvider {
 	JSONArray array=new JSONArray();
 	@SuppressWarnings("unchecked")
-	public JSONArray getCountryList(){
-		String keyString="getCountryList";
+	public void getCountryList(int limit,String curString){
+		String keyString="CountryList";
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
-		if(MCacheService.get(keyString)!=null){
-			System.out.println("inside memcache");
-			return (JSONArray) MCacheService.get(keyString);
+		Query query = pm.newQuery(TimezoneJDO.class);
+		query.setRange(0, limit);			
+		System.out.println(query.toString());
+		if(curString!=null){
+			Cursor cursor=Cursor.fromWebSafeString(curString);
+			Map<String,Object> extnMap=new HashMap<String, Object>();
+			extnMap.put(JDOCursorHelper.CURSOR_EXTENSION, cursor);
+			query.setExtensions(extnMap);
 		}
-		else{
-			Query query = pm.newQuery(TimezoneJDO.class);
-			query.setRange(0, 1000);			
-			System.out.println(query.toString());
-			
 			try {
-			  @SuppressWarnings("unchecked")
-			List<TimezoneJDO> results = (List<TimezoneJDO>)query.execute ();
-//			  Cursor cursor = JDOCursorHelper.getCursor(results);
-//			  String cursorString=cursor.toWebSafeString();
-			  System.out.println(query.execute());
-			  if (!results.isEmpty()) {
-				  Collection<String> country=new TreeSet<String>();
-				  for (TimezoneJDO tj: results) {
-				      country.add(tj.getCountry());
-				  }	
+				List<TimezoneJDO> results = (List<TimezoneJDO>)query.execute ();
+				Cursor cursor = JDOCursorHelper.getCursor(results);
+				String cursorString=cursor.toWebSafeString();
+				System.out.println(results);
+				if (!results.isEmpty()) {
+					Collection<String> country=new TreeSet<String>();
+					for (TimezoneJDO tj: results) {
+						country.add(tj.getCountry());
+					}	
+					System.out.println(country);
+					if(MCacheService.get(keyString)!=null){
+					country.addAll((TreeSet<String>) MCacheService.get(keyString));
+					}
+					MCacheService.set(keyString, country);
+					System.out.println(array.toJSONString());
+					
+					Queue queue=QueueFactory.getDefaultQueue();
+					queue.add(TaskOptions.Builder.withUrl("/countrylist").param("limit", "1000").param("cursorString", cursorString)); 
+					
 				  
-				  array=new JSONArray();
-				  array.addAll(country);
-				  MCacheService.set(keyString, array);
-				  System.out.println(array.toJSONString());
-				  return array;
-				  
-			  } 
+			} 
 			  else {
-			    return null;
+				  Collection<String> data=(TreeSet<String>) MCacheService.get(keyString);
+				  array=new JSONArray();
+				  array.addAll(data);
+				  System.out.println("inside  sdklgjskgjs k");
+				  MCacheService.set("getCountryList", array);
+				  MCacheService.remove(keyString);
 			  }
 			} 
 			finally {
 			  query.closeAll();
 			}
 		}
-		
-		
-	}
 	
 	@SuppressWarnings("unchecked")
 	public JSONArray getStateList(String country){
