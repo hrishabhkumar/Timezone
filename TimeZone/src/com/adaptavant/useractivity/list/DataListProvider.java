@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -22,16 +24,17 @@ import com.google.appengine.datanucleus.query.JDOCursorHelper;
 
 
 public class DataListProvider {
+	Logger logger=Logger.getLogger("DataListProvider");
 	JSONArray array=new JSONArray();
 	@SuppressWarnings("unchecked")
-	public void getCountryList(int limit,String curString){
+	public void getCountryList(int limit,String cursorString){
 		String keyString="CountryList";
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
 		Query query = pm.newQuery(TimezoneJDO.class);
 		query.setRange(0, limit);			
-		System.out.println(query.toString());
-		if(curString!=null){
-			Cursor cursor=Cursor.fromWebSafeString(curString);
+		logger.log(Level.INFO,query.toString());
+		if(cursorString!=null){
+			Cursor cursor=Cursor.fromWebSafeString(cursorString);
 			Map<String,Object> extnMap=new HashMap<String, Object>();
 			extnMap.put(JDOCursorHelper.CURSOR_EXTENSION, cursor);
 			query.setExtensions(extnMap);
@@ -39,75 +42,84 @@ public class DataListProvider {
 			try {
 				List<TimezoneJDO> results = (List<TimezoneJDO>)query.execute ();
 				Cursor cursor = JDOCursorHelper.getCursor(results);
-				String cursorString=cursor.toWebSafeString();
+				cursorString=cursor.toWebSafeString();
 				System.out.println(results);
 				if (!results.isEmpty()) {
 					Collection<String> country=new TreeSet<String>();
 					for (TimezoneJDO tj: results) {
 						country.add(tj.getCountry());
-					}	
-					System.out.println(country);
+					}
 					if(MCacheService.get(keyString)!=null){
 					country.addAll((TreeSet<String>) MCacheService.get(keyString));
 					}
 					MCacheService.set(keyString, country);
-					System.out.println(array.toJSONString());
-					
-					Queue queue=QueueFactory.getDefaultQueue();
-					queue.add(TaskOptions.Builder.withUrl("/countrylist").param("limit", "1000").param("cursorString", cursorString)); 
-					
-				  
-			} 
-			  else {
-				  Collection<String> data=(TreeSet<String>) MCacheService.get(keyString);
-				  array=new JSONArray();
-				  array.addAll(data);
-				  System.out.println("inside  sdklgjskgjs k");
-				  MCacheService.set("getCountryList", array);
-				  MCacheService.remove(keyString);
+					if(results.size()==limit){
+						Queue queue = QueueFactory.getQueue("subscription-queue");
+						queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("cursorString", cursorString).param("list", "country"));
+						
+					}
+					else {
+						Collection<String> data=(TreeSet<String>) MCacheService.get(keyString);
+						array=new JSONArray();
+						array.addAll(data);
+						logger.log(Level.INFO,"Updating Memcache with country List");
+						MCacheService.set("getCountryList", array);
+						MCacheService.remove(keyString);
+					} 
 			  }
 			} 
 			finally {
 			  query.closeAll();
 			}
+			
 		}
 	
 	@SuppressWarnings("unchecked")
-	public JSONArray getStateList(String country){
-		String keyString="getStateList"+country;
+	public JSONArray getStateList(String country, int limit, String cursorString){
+		String keyString="getStateList1"+country;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
-		if(MCacheService.get(keyString)!=null){
-			System.out.println("inside memcache");
-			return (JSONArray) MCacheService.get(keyString);
+		Query query = pm.newQuery(TimezoneJDO.class , "country == '"+country+"'");
+		query.setRange(0, limit);
+		logger.log(Level.INFO,query.toString());
+		if(cursorString!=null){
+			Cursor cursor=Cursor.fromWebSafeString(cursorString);
+			Map<String,Object> extnMap=new HashMap<String, Object>();
+			extnMap.put(JDOCursorHelper.CURSOR_EXTENSION, cursor);
+			query.setExtensions(extnMap);
 		}
-		else{
-		Query query = pm.newQuery(TimezoneJDO.class, "country == '"+country+"'");
-	
-		query.setResult ("distinct state");
-	
-		System.out.println(query.toString());
 		try {
-		  Collection<?> results = (Collection<?>)query.execute (); 
+			List<TimezoneJDO> results = (List<TimezoneJDO>)query.execute ();
+			Cursor cursor = JDOCursorHelper.getCursor(results);
+			cursorString=cursor.toWebSafeString();
 		  System.out.println(query.execute());
 		  if (!results.isEmpty()) {
-			 
 			  Collection<String> state=new TreeSet<String>();
-			  state.addAll((Collection<? extends String>) results);
-			  
-			  array=new JSONArray();
-			  array.addAll(state);
-				MCacheService.set(keyString, array);
-			  return array;
-			  
-		  } else {
-			  
-		    return null;
-		  }
+			  for (TimezoneJDO tj: results) {
+					state.add(tj.getState());
+				}
+				if(MCacheService.get(keyString)!=null){
+					state.addAll((TreeSet<String>) MCacheService.get(keyString));
+				}
+				System.out.println(state);
+				MCacheService.set(keyString, state);
+				if(results.size()==limit){
+					Queue queue = QueueFactory.getQueue("subscription-queue");
+					queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("cursorString", cursorString).param("country", country).param("list", "state"));
+				}
+				else {
+					Collection<String> data=(TreeSet<String>) MCacheService.get(keyString);
+					array=new JSONArray();
+					array.addAll(data);
+					logger.log(Level.INFO,"Updating Memcache with state List");
+					MCacheService.set("getStateList"+country, array);
+					MCacheService.remove(keyString);
+				}
+		  }	
+			 
 		} finally {
 		  query.closeAll();
 		}
-		}
-		
+		return array;		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -129,12 +141,10 @@ public class DataListProvider {
 		  System.out.println(query.execute());
 		  if (!results.isEmpty()) {
 			  Collection<String> city=new TreeSet<String>();
-			  
 			  city.addAll((Collection<? extends String>) results);
-			  
 			  array=new JSONArray();
 			  array.addAll(city);
-				MCacheService.set(keyString, array);
+			  MCacheService.set(keyString, array);
 			  return array;
 			  
 		  } else {

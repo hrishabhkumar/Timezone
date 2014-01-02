@@ -6,13 +6,14 @@ $(document).ready(function(){
 	};
 	dataString=JSON.stringify(dataString);
 	console.log(dataString);
+	$('#country').html("Please Wait...");
 	$.ajax({
 		url: "getList",
 		type: "post",
 		dataType: "json",
 		contentType: "application/json",
 		data: dataString,
-		async: false,
+		async: true,
 		cache: false,
 		processData:false,
 		success: function(data){
