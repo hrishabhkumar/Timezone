@@ -27,7 +27,7 @@ public class DataListProvider {
 	Logger logger=Logger.getLogger("DataListProvider");
 	JSONArray array=new JSONArray();
 	@SuppressWarnings("unchecked")
-	public void getCountryList(int limit,String cursorString){
+	public synchronized void getCountryList(int limit,String cursorString){
 		String keyString="CountryList";
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
 		Query query = pm.newQuery(TimezoneJDO.class);
@@ -56,7 +56,6 @@ public class DataListProvider {
 					if(results.size()==limit){
 						Queue queue = QueueFactory.getQueue("subscription-queue");
 						queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("cursorString", cursorString).param("list", "country"));
-						
 					}
 					else {
 						Collection<String> data=(TreeSet<String>) MCacheService.get(keyString);
@@ -66,14 +65,12 @@ public class DataListProvider {
 						MCacheService.set("getCountryList", array);
 						MCacheService.remove(keyString);
 					} 
-			  }
+				}
 			} 
 			finally {
 			  query.closeAll();
 			}
-			
 		}
-	
 	@SuppressWarnings("unchecked")
 	public JSONArray getStateList(String country, int limit, String cursorString){
 		String keyString="getStateList1"+country;
@@ -115,8 +112,8 @@ public class DataListProvider {
 					MCacheService.remove(keyString);
 				}
 		  }	
-			 
-		} finally {
+		} 
+		finally {
 		  query.closeAll();
 		}
 		return array;		
@@ -132,9 +129,7 @@ public class DataListProvider {
 		}
 		else{
 		Query query = pm.newQuery(TimezoneJDO.class, "country == '"+country+"'&& state == '"+state+"'");
-	
 		query.setResult ("distinct city");
-	
 		System.out.println(query.toString());
 		try {
 		  Collection<?> results = (Collection<?>)query.execute (); 

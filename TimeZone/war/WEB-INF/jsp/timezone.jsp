@@ -21,21 +21,39 @@
 			<h1>Please Select Country, State and City to get time of particular place.</h1>
 			<div>
 				<form class='form' id="searchForm">
-					<select id="country">
-						 
-					</select> 
+					<div class="row">
+						<div class=col-sm-4>
+							<label for="country">Country:</label>
+							<select id="country" class=form-control>
+							</select> 
+						</div>
+					</div>
 					
-					<select id=state>
+					<div class="row">
+						<div class=col-sm-4>
+							<label for="state">State:</label>
+							<select id=state class=form-control>
+							</select>
+						</div>
+					</div>
+				
+					<div class="row">
+						<div class=col-sm-4>
+						<label for="state">City:</label>
+						<select id=city class=form-control>
+						
+						</select>
+						</div>
+					</div>
 					
-					</select>
-					
-					<select id=city>
-					
-					</select>
 					<input type="hidden" id="keyString" value='${key}'>
-					<button type="submit" id="seachButton">Search</button>
+					<br>
+					<div class=col-sm-4>
+					<button type="submit" id="seachButton" class="btn btn-success">Search</button>
+					</div>
 				</form>
 	</div>
+	
 	<div class="container">
 	    <div class="row">
 	    	<div class="col-lg-9">

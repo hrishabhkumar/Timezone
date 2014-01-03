@@ -38,7 +38,6 @@ public class TimezoneController {
 	@RequestMapping(value="/timezone", method=RequestMethod.POST)
 	public @ResponseBody String registerAction(HttpServletRequest req, @RequestBody String timezonejson) throws ParseException{
 		try{
-			
 		JSONParser parser=new JSONParser();
 		JSONObject jsonObject=(JSONObject) parser.parse(timezonejson);
 		String key=jsonObject.get("key").toString();
@@ -77,22 +76,26 @@ public class TimezoneController {
 				String timezonedata=timezone.getTimezoneData(key, city, state, country);
 				logger.info("timezone data:  "+timezonedata);
 				tomezonejson=(JSONObject) parser.parse(timezonedata);
+				tomezonejson.put("status", "success");
 				return tomezonejson.toJSONString();
 			}
 			catch(Exception e){
 				logger.log(Level.WARNING,"Error in data");
 				tomezonejson.put("data", "data is not in proper format");
+				tomezonejson.put("status", "failed");
 				return tomezonejson.toJSONString();
 		}
 		}else{
 			JSONObject tomezonejson=new JSONObject();
-			tomezonejson.put("data", "data is not in proper format");
+			tomezonejson.put("data", "Key is not available");
+			tomezonejson.put("status", "failed");
 			return tomezonejson.toJSONString();
 		}
 		} catch (ParseException e1) {
 			logger.log(Level.WARNING,"Error in Parsing");
 			JSONObject tomezonejson=new JSONObject();
 			tomezonejson.put("data", "data is not in proper format");
+			tomezonejson.put("status", "failed");
 			return tomezonejson.toJSONString();
 		}
 		
@@ -108,9 +111,10 @@ public class TimezoneController {
 	@RequestMapping(value="/getList")
 	public @ResponseBody String getList(@RequestBody String json){
 		JSONParser parser=new JSONParser();
+		JSONObject jsonObject;
 		try {
 			logger.info(json);
-			JSONObject jsonObject=(JSONObject) parser.parse(json);
+			jsonObject=(JSONObject) parser.parse(json);
 			DataListProvider dlp=new DataListProvider();
 			if(jsonObject.get("required").toString().equals("country")){
 				logger.info("inside country");
@@ -119,13 +123,15 @@ public class TimezoneController {
 					JSONArray str=(JSONArray) MCacheService.get("getCountryList");
 					jsonObject=new JSONObject();
 					jsonObject.put("list", str);
+					jsonObject.put("status", "success");
 					return jsonObject.toJSONString();
 				}
 				else{
-					dlp.getCountryList(1000, null);
-					JSONArray str=(JSONArray) MCacheService.get("getCountryList");
-					jsonObject=new JSONObject();
-					jsonObject.put("list", str);
+					if(!MCacheService.containsKey("CountryList")){					
+						Queue queue = QueueFactory.getQueue("subscription-queue");
+						queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "country").taskName("getCountry1-"));
+					}
+					jsonObject.put("status", "wait");
 					return jsonObject.toJSONString();
 				}
 			}
@@ -137,14 +143,23 @@ public class TimezoneController {
 					JSONArray str=(JSONArray) MCacheService.get("getStateList"+country);
 					jsonObject=new JSONObject();
 					jsonObject.put("list", str);
+					jsonObject.put("status", "success");
 					return jsonObject.toJSONString();
 				}
-				JSONArray state=dlp.getStateList(country, 1000, null);
-				logger.log(Level.INFO,state.toJSONString());
-				jsonObject=new JSONObject();
-				jsonObject.put("list", state);
-				logger.log(Level.INFO,jsonObject.toJSONString());
-				return jsonObject.toJSONString();
+				else{
+					logger.log(Level.INFO,jsonObject.toJSONString());
+					JSONArray state=dlp.getStateList(country, 1000, null);
+					jsonObject=new JSONObject();
+					jsonObject.put("list", state);
+					if(state!=null){
+						jsonObject.put("status", "success");
+					}
+					else{
+						jsonObject.put("status", "wait");
+					}
+					return jsonObject.toJSONString();
+				}
+				
 			}
 			else if(jsonObject.get("required").toString().equals("city")){
 				System.out.println("inside City");
@@ -154,27 +169,28 @@ public class TimezoneController {
 				logger.log(Level.INFO,city.toJSONString());
 				jsonObject=new JSONObject();
 				jsonObject.put("list", city);
+				jsonObject.put("status", "success");
 				System.out.println(jsonObject.toJSONString());
 				return jsonObject.toJSONString();
 			}
 			else{
-				JSONObject timezonejson=new JSONObject();
-				timezonejson.put("data", "data is not in proper format");
-				return timezonejson.toJSONString();
+				jsonObject=new JSONObject();
+				jsonObject.put("status", "error");
+				return jsonObject.toJSONString();
 			}
 		} catch (ParseException e) {
 			logger.log(Level.WARNING, "parsing Exception in Request body");
-			JSONObject timezonejson=new JSONObject();
-			timezonejson.put("data", "data is not in proper format");
-			return timezonejson.toJSONString();
+			jsonObject=new JSONObject();
+			jsonObject.put("status", "error");
+			return jsonObject.toJSONString();
 		}
 	}
-	
+	DataListProvider dlp=new DataListProvider();
 	@RequestMapping("/list")
-	public void getcountrylist(HttpServletRequest req, HttpServletResponse resp){
+	public void getlist(HttpServletRequest req, HttpServletResponse resp){
 		int limit=Integer.parseInt(req.getParameter("limit"));
 		String cursorString=req.getParameter("cursorString");
-		DataListProvider dlp=new DataListProvider();
+		
 		if(req.getParameter("list").equals("country")){
 			dlp.getCountryList(limit, cursorString);
 		}

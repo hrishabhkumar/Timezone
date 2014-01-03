@@ -1,76 +1,55 @@
 $(document).ready(function(){
+	 function ajax_call(name, dataString) {
+		 var id='#'+name;
+		 $.ajax({
+				url: "getList",
+				type: "post",
+				dataType: "json",
+				contentType: "application/json",
+				data: dataString,
+				async: true,
+				cache: false,
+				processData:false,
+				success: function(data){
+					if(data.status=="success"){
+						var listdata=data.list;
+						if(listdata.length!=0){
+							var output='<option selected=true>select '+name+'</option>';
+							for (var i in listdata) {
+								output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
+							}
+							$(id).html(output);
+						}
+					}
+					else{
+						$('#searchResult').html("<h1>Please wait...</h1>");
+					}
+			      },
+			    error: function(data){
+			    }
+			});
+	    }
 	$(function(){
+		
 	var str="country";	
 	var dataString={
 			required: str
 	};
 	dataString=JSON.stringify(dataString);
 	console.log(dataString);
-	$('#country').html("Please Wait...");
-	$.ajax({
-		url: "getList",
-		type: "post",
-		dataType: "json",
-		contentType: "application/json",
-		data: dataString,
-		async: true,
-		cache: false,
-		processData:false,
-		success: function(data){
-		
-			var listdata=data.list;
-			
-			if(listdata.length!=0){
-				var output='<option selected=true>select Country</option>';
-				for (var i in listdata) {
-					output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
-				}
-				$('#country').html(output);
-			}
-			else{
-				
-				
-			}
-	      },
-	    error: function(data){
-	    }
+	ajax_call('country', dataString);
 	});
-	});
+	
+	//Getting State List
 	$('#country').change(function(){
+		$('#city').empty();
 		var str="state";
 		var dataString={
 				"country":$('#country option:selected').text(),
 				"required":str	
 			};
 			dataString=JSON.stringify(dataString);
-			$.ajax({
-				url: "getList",
-				type: "post",
-				dataType: "json",
-				contentType: "application/json",
-				data: dataString,
-				async: false,
-				cache: false,
-				processData:false,
-				success: function(data){
-					listdata=data.list;
-					if(listdata.length!=0){
-						var output='<option selected=true>select State</option>';
-					
-						for (var i in listdata) {
-							output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
-						}
-						$('#state').html(output);
-					}
-					else{
-						
-						
-					}
-			      },
-			    error: function(data){
-			    }
-			
-		});
+			ajax_call('state', dataString);
 	});
 			
 		$('#state').change(function(){
@@ -80,30 +59,7 @@ $(document).ready(function(){
 				"required":"city"	
 			};
 			dataString=JSON.stringify(dataString);
-			$.ajax({
-				url: "getList",
-				type: "post",
-				dataType: "json",
-				contentType: "application/json",
-				data: dataString,
-				async: false,
-				cache: false,
-				processData:false,
-				success: function(data){
-					listdata=data.list;
-					if(listdata.length!=0){
-						var output='<option selected=true>select City</option>';		
-						for (var i in listdata) {
-							output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
-						}
-						$('#city').html(output);
-					}
-					else{			
-					}
-				},
-				error: function(data){
-				}
-			});
+			ajax_call('city', dataString);
 		});
 		
 		$('#searchForm').submit(function(event){
@@ -124,7 +80,7 @@ $(document).ready(function(){
 					dataType: "json",
 					contentType: "application/json",
 					data: dataString,
-					async: false,
+					async: true,
 					cache: false,
 					processData:false,
 					success: function(data){
@@ -143,8 +99,6 @@ $(document).ready(function(){
 								output+='latitude: '+timezonedata[i].latitude+'<br>';
 								output+='country: '+timezonedata[i].country+'<br>';
 								output+='city: '+timezonedata[i].city+'<br>';
-//								
-//								
 							}
 							$('#searchResult').html(output);
 						
