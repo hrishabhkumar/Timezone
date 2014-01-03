@@ -1,5 +1,7 @@
 package com.adaptavant.jdo.customer;
 
+import java.util.Date;
+
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -22,6 +24,9 @@ public class CustomerJDO {
 	
 	@Persistent
 	private int requests;
+	
+	@Persistent
+	private Date lastLogin;
 
 
 	/**
@@ -85,5 +90,21 @@ public class CustomerJDO {
 	 */
 	public void setKey(String key) {
 		this.key = key;
+	}
+
+
+	/**
+	 * @return the lastLogin
+	 */
+	public Date getLastLogin() {
+		return lastLogin;
+	}
+
+
+	/**
+	 * @param lastLogin the lastLogin to set
+	 */
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
 	}
 }

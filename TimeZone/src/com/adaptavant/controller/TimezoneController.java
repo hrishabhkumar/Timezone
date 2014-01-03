@@ -91,7 +91,7 @@ public class TimezoneController {
 			tomezonejson.put("status", "failed");
 			return tomezonejson.toJSONString();
 		}
-		} catch (ParseException e1) {
+		} catch (Exception e1) {
 			logger.log(Level.WARNING,"Error in Parsing");
 			JSONObject tomezonejson=new JSONObject();
 			tomezonejson.put("data", "data is not in proper format");
@@ -197,9 +197,5 @@ public class TimezoneController {
 		else if(req.getParameter("list").equals("state")){
 			dlp.getStateList(req.getParameter("country"), limit, cursorString);
 		}
-		
-		
 	}
-	
-	
 }

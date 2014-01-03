@@ -3,8 +3,11 @@
  */
 package com.adaptavant.useractivity.login;
 
+import java.util.Date;
+
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpSession;
+
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.customer.CustomerJDO;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -35,12 +38,12 @@ public class Login {
 					
 					if(email.equals(customer.getEmail())&& password.equals(customer.getPassword())){
 						System.out.println("value for req  "+email);
-						int request=customer.getRequests();
-						request++;
-						customer.setRequests(request);
+						Date lastLogin=customer.getLastLogin();
+						Date currentTime=new Date();
+						customer.setLastLogin(currentTime);
 						session.setAttribute("userid", customer.getEmail());
 						session.setAttribute("key", keyString);
-						session.setAttribute("request", customer.getRequests());
+						session.setAttribute("lastLogin", lastLogin);
 						System.out.println("Key String: "+keyString);
 						return keyString;
 					}

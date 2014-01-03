@@ -34,11 +34,11 @@
 		     			<p class="form-control-static">${userid}</p>
 		     		</div>
 		     	</div>
-		     	<%if(session.getAttribute("request")!=null){ %>
+		     	<%if(session.getAttribute("lastLogin")!=null){ %>
 			     	<div class="form-group">
-			    		<label class="col-sm-2 control-label">Login Count :</label>
+			    		<label class="col-sm-2 control-label">Last Login Time :</label>
 						<div class="col-sm-10">
-			     			<p class="form-control-static">${request}</p>
+			     			<p class="form-control-static">${lastLogin}</p>
 			     		</div>
 			     	</div>
 				<%} %>

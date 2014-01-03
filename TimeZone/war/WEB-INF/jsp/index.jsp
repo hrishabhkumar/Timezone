@@ -49,7 +49,7 @@
 					        </div>
 					    </div>
 				    </form>
-				    
+				    <!--  
 				    	Or Login with:
 				    	<div class="form-group">
 				    	<a  class="btn btn-primary" id="facebook" href="https://www.facebook.com/dialog/oauth?client_id=380368472106874&response_type=code&redirect_uri=http://springbyhrishabh.appspot.com/outh2facebook&scope=publish_stream,email">Facebook</a>
@@ -57,7 +57,7 @@
 				&response_type=code&client_id=854504709839-g6h8lb5pidkqqu6gk5g9qgeup3cphv5p.apps.googleusercontent.com
 				&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&approval_prompt=force&access_type=offline">Google</a>
 				    	<p class="help-block">If You don't have these then <a href="/register.html" >Register Here</a></p>
-				    </div>
+				    </div>-->
     			</div>
     		</div>
     <jsp:include page="footer.jsp"></jsp:include>
