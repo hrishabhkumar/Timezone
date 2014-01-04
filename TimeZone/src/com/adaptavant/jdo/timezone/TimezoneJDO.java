@@ -29,10 +29,10 @@ public class TimezoneJDO {
 	private String timeZoneName;
 	
 	@Persistent
-	private String rawOffset;
+	private long rawOffset;
 	
 	@Persistent
-	private String dstOffset;
+	private int dstOffset;
 	
 	@Persistent
 	private String state;
@@ -103,7 +103,7 @@ public class TimezoneJDO {
 	/**
 	 * @return the rawOffset
 	 */
-	public String getRawOffset() {
+	public long getRawOffset() {
 		return rawOffset;
 	}
 
@@ -111,15 +111,15 @@ public class TimezoneJDO {
 	/**
 	 * @param rawOffset2 the rawOffset to set
 	 */
-	public void setRawOffset(String rawOffset2) {
-		this.rawOffset = rawOffset2;
+	public void setRawOffset(long rawOffset) {
+		this.rawOffset = rawOffset;
 	}
 
 
 	/**
 	 * @return the dstOffset
 	 */
-	public String getDstOffset() {
+	public int getDstOffset() {
 		return dstOffset;
 	}
 
@@ -127,8 +127,8 @@ public class TimezoneJDO {
 	/**
 	 * @param dstOffset2 the dstOffset to set
 	 */
-	public void setDstOffset(String dstOffset2) {
-		this.dstOffset = dstOffset2;
+	public void setDstOffset(int dstOffset) {
+		this.dstOffset = dstOffset;
 	}
 
 

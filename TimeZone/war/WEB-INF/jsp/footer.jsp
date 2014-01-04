@@ -5,6 +5,5 @@
 		
 		<div class="container">
 			<p class="navbar-text">&copy; Hrishabh Kumar</p>
-			<a href="#" class="navbar-button btn-danger btn pull-right">YouTube</a>
 		</div>
 	</div>

@@ -84,12 +84,10 @@ $(document).ready(function(){
 					cache: false,
 					processData:false,
 					success: function(data){
+						var time=data.currentTime;
 						timezonedata=data.data;
-						
-							
 							var output='<h1>Your timeZone Data:</h1><br>';
 							for (var i in timezonedata) {
-								
 								output+="timeZoneID: "+timezonedata[i].timeZoneID+'<br>';
 								output+='rawOffset: '+timezonedata[i].rawOffset+'<br>';
 								output+='dstOffset: '+timezonedata[i].dstOffset+'<br>';
@@ -99,13 +97,15 @@ $(document).ready(function(){
 								output+='latitude: '+timezonedata[i].latitude+'<br>';
 								output+='country: '+timezonedata[i].country+'<br>';
 								output+='city: '+timezonedata[i].city+'<br>';
+								output+='Current DST Time: '+data.currentDSTTime+'<br>';
+								output+='Current UTC Time: '+data.currentUTCTime+'<br>';
 							}
+							
 							$('#searchResult').html(output);
 						
 					},
 					error: function(data){
 					}
-				
 			});
 		});
 });
