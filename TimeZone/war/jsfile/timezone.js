@@ -97,8 +97,10 @@ $(document).ready(function(){
 								output+='latitude: '+timezonedata[i].latitude+'<br>';
 								output+='country: '+timezonedata[i].country+'<br>';
 								output+='city: '+timezonedata[i].city+'<br>';
-								output+='Current DST Time: '+data.currentDSTTime+'<br>';
-								output+='Current UTC Time: '+data.currentUTCTime+'<br>';
+								var rawOffset=parseInt(timezonedata[i].rawOffset)+data.currentTime;
+								var dstOffset=parseInt(timezonedata[i].dstOffset)+data.currentTime;
+								output+='Current DST Time: '+new Date(dstOffset).toUTCString()+'<br>';
+								output+='Current UTC Time: '+new Date(rawOffset).toUTCString()+'<br>';
 							}
 							
 							$('#searchResult').html(output);

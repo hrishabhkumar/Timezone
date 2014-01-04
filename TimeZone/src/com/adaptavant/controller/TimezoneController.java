@@ -77,6 +77,8 @@ public class TimezoneController {
 				String timezonedata=timezone.getTimezoneData(key, city, state, country);
 				logger.info("timezone data:  "+timezonedata);
 				tomezonejson=(JSONObject) parser.parse(timezonedata);
+				Calendar cal=Calendar.getInstance();
+				tomezonejson.put("currentTime", cal.getTimeInMillis());
 				tomezonejson.put("status", "success");
 				return tomezonejson.toJSONString();
 			}

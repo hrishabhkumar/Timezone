@@ -28,7 +28,7 @@
 							</select> 
 						</div>
 					</div>
-					
+					<span></span>
 					<div class="row">
 						<div class=col-sm-4>
 							<label for="state">State:</label>
