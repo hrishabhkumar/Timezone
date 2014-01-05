@@ -15,7 +15,13 @@
 	<link href="css/bootstrap.min.css" rel="stylesheet">
      <script src="js/bootstrap.min.js"></script>
      <script src="jsfile/script.js"></script>
-	
+	<script type="text/javascript">
+	$(document).ready(function(){
+	     if (!$('#login').hasClass('active')) {
+	 		$('#login').addClass('active');
+	 	}
+	     });
+	</script>
 </head>
 <body>
 	<jsp:include page="header.jsp"></jsp:include>
@@ -32,6 +38,7 @@
 	    			 	<div class="col-xs-4">
 	    			 		<label for="username">User Name:</label>
 		    					<input type="text" placeholder="Email" class="form-control" name="userid" id="userid">
+		    					<span id="useridSpan" class="help-block"></span>
 		    				</div>
 		    			</div> 
 		    			
@@ -40,6 +47,7 @@
 		    			
 		    			<label for="password">Password:</label>
 					        <input type="password" placeholder="Password" class="form-control" name="password" id="password">
+					        <span id="passwordSpan" class="help-block"></span>
 						</div>
 						</div>
 					    <div class="form-group">

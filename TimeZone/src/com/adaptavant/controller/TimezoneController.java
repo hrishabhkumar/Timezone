@@ -37,7 +37,7 @@ public class TimezoneController {
 	}
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/timezone", method=RequestMethod.POST)
-	public @ResponseBody String registerAction(HttpServletRequest req, @RequestBody String timezonejson) throws ParseException{
+	public @ResponseBody String timezoneAction( @RequestBody String timezonejson) throws ParseException{
 		try{
 		JSONParser parser=new JSONParser();
 		JSONObject jsonObject=(JSONObject) parser.parse(timezonejson);
@@ -52,7 +52,7 @@ public class TimezoneController {
 				System.out.println(city);
 			}
 			catch(Exception e){
-				logger.log(Level.WARNING,"City name is null");
+				logger.warning("City name is null");
 				city=null;
 			}
 			try{
@@ -77,9 +77,6 @@ public class TimezoneController {
 				String timezonedata=timezone.getTimezoneData(key, city, state, country);
 				logger.info("timezone data:  "+timezonedata);
 				tomezonejson=(JSONObject) parser.parse(timezonedata);
-				Calendar cal=Calendar.getInstance();
-				tomezonejson.put("currentTime", cal.getTimeInMillis());
-				tomezonejson.put("status", "success");
 				return tomezonejson.toJSONString();
 			}
 			catch(Exception e){
@@ -174,6 +171,14 @@ public class TimezoneController {
 				jsonObject.put("list", city);
 				jsonObject.put("status", "success");
 				System.out.println(jsonObject.toJSONString());
+				return jsonObject.toJSONString();
+			}
+			else if(jsonObject.get("required").toString().equals("timezoneData")){
+				jsonObject =(JSONObject) jsonObject.get("data");
+				jsonObject=(JSONObject) parser.parse(timezoneAction(jsonObject.toJSONString()));
+				Calendar cal=Calendar.getInstance();
+				jsonObject.put("currentTime", cal.getTimeInMillis());
+				jsonObject.put("status", "success");
 				return jsonObject.toJSONString();
 			}
 			else{

@@ -14,6 +14,25 @@
 	<link href="css/bootstrap.min.css" rel="stylesheet">
      <script src="js/bootstrap.min.js"></script>
      <script src="jsfile/timezone.js"></script>
+     <script type="text/javascript">
+     function date_time(id, offset)
+	 {
+		 	
+	         date = new Date();
+	         date=new Date(date.getTime()+offset).toUTCString();
+	         document.getElementById(id).innerHTML = date;
+	         setTimeout('date_time("'+id+'",'+offset+');','1000');
+	         return true;
+	 }
+     
+    
+     $(document).ready(function(){
+         if (!$('#timezone').hasClass('active')) {
+     		$('#timezone').addClass('active');
+     	}
+         });
+   
+     </script>
 </head>
 <body>
 	<jsp:include page="header.jsp"></jsp:include>
@@ -48,29 +67,32 @@
 					
 					<input type="hidden" id="keyString" value='${key}'>
 					<br>
+					<div class="row">
 					<div class=col-sm-4>
 					<button type="submit" id="seachButton" class="btn btn-success">Search</button>
 					</div>
+					</div>
 				</form>
 	</div>
-	
+	</div>
+	<br>
 	<div class="container">
 	    <div class="row">
 	    	<div class="col-lg-9">
 	    		<div class="panel  panel-default">
 	    			<div class="panel-body">
-	    			<div class="page-header">
+	    			<div class="page-header" id=resultHeader>
 	    			
 	    			</div>
 	    				<div id="searchResult">
-							<span></span>
+							
 						</div>
 	    			</div>
 	    		</div>
 	    	</div>
 	    </div>
     </div>
-		</div>
+		
 	<jsp:include page="footer.jsp"></jsp:include>
 </body>
 </html>

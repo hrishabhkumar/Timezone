@@ -29,8 +29,8 @@ $(document).ready(function(){
 			    }
 			});
 	    }
+	
 	$(function(){
-		
 	var str="country";	
 	var dataString={
 			required: str
@@ -73,42 +73,74 @@ $(document).ready(function(){
 					"key": $('#keyString').val(),
 					"place": place
 				};
-				dataString=JSON.stringify(dataString);
-				$.ajax({
-					url: "timezone",
-					type: "post",
-					dataType: "json",
-					contentType: "application/json",
-					data: dataString,
-					async: true,
-					cache: false,
-					processData:false,
-					success: function(data){
-						var time=data.currentTime;
-						timezonedata=data.data;
-							var output='<h1>Your timeZone Data:</h1><br>';
-							for (var i in timezonedata) {
-								output+="timeZoneID: "+timezonedata[i].timeZoneID+'<br>';
-								output+='rawOffset: '+timezonedata[i].rawOffset+'<br>';
-								output+='dstOffset: '+timezonedata[i].dstOffset+'<br>';
-								output+='state: '+timezonedata[i].state+'<br>';
-								output+='longitude: '+timezonedata[i].longitude+'<br>';
-								output+='timeZoneName: '+timezonedata[i].timeZoneName+'<br>';
-								output+='latitude: '+timezonedata[i].latitude+'<br>';
-								output+='country: '+timezonedata[i].country+'<br>';
-								output+='city: '+timezonedata[i].city+'<br>';
-								var rawOffset=parseInt(timezonedata[i].rawOffset)+data.currentTime;
-								var dstOffset=parseInt(timezonedata[i].dstOffset)+data.currentTime;
-								output+='Current DST Time: '+new Date(dstOffset).toUTCString()+'<br>';
-								output+='Current UTC Time: '+new Date(rawOffset).toUTCString()+'<br>';
-							}
-							
-							$('#searchResult').html(output);
+			dataString={
+				"required":"timezoneData",
+				"data": dataString
+			};
+			dataString=JSON.stringify(dataString);
+			$.ajax({
+				url: "getList",
+				type: "post",
+				dataType: "json",
+				contentType: "application/json",
+				data: dataString,
+				async: true,
+				cache: false,
+				processData:false,
+				success: function(data){
+					var time=data.currentTime;
+					timezonedata=data.data;
+					var totalrawOffset;
+					$('#resultHeader').html("<h1>Your timeZone Data:</h1>");
+					var output='<div class="form-horizontal">';
+					for (var i in timezonedata) {
+						output+='<div class="form-group"><label class="col-sm-3 control-label ">timeZoneID:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].timeZoneID+'</p></div></div>';
 						
-					},
-					error: function(data){
+						output+='<div class="form-group"><label class="col-sm-3 control-label">TimeZone Name:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].timeZoneName+'</p></div></div>';
+						
+						output+='<div class="form-group"><label class="col-sm-3 control-label">Country :</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].country+'</p></div></div>';
+						
+						output+='<div class="form-group"><label class="col-sm-3 control-label">State:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].state+'</p></div></div>';
+						
+						output+='<div class="form-group"><label class="col-sm-3 control-label">City:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].city+'</p></div></div>';
+						
+						output+='<div class="form-group"><label class="col-sm-3 control-label">Longitude:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].longitude+'</p></div></div>';
+						
+						output+='<div class="form-group"><label class="col-sm-3 control-label">Latitude:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].latitude+'</p></div></div>';
+						
+						output+='<div class="form-group"><label class="col-sm-3 control-label">Raw Offset:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].rawOffset+'</p></div></div>';
+						
+						output+='<div class="form-group"><label class="col-sm-3 control-label">DST Offset:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].dstOffset+'</p></div></div>';
+						
+						output+='<div class="form-group"><label class="col-sm-3 control-label">Current DST Time:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static" id="dstTime"></p></div></div>';
+						
+						output+='<div class="form-group"><label class="col-sm-3 control-label">DST Offset:</label>';
+						output+='<div class="col-sm-9"><p class="form-control-static" id="rawTime"></p></div></div></div>';
+						
+						var rawOffset=parseInt(timezonedata[i].rawOffset)+data.currentTime;
+						var dstOffset=parseInt(timezonedata[i].dstOffset)+data.currentTime;
+						var clientDate=new Date();
+						var timeDiff=data.currentTime-clientDate.getTime();
+						rawOffset=parseInt(timezonedata[i].rawOffset)+timeDiff;
+						dstOffset=parseInt(timezonedata[i].dstOffset)+timeDiff;
+						output+='<script type="text/javascript">window.onload = date_time("rawTime", parseInt('+rawOffset+'));</script>';
+						output+='<script type="text/javascript">window.onload = date_time("dstTime", parseInt('+dstOffset+'));</script>';
 					}
-			});
+					$('#searchResult').html(output);
+				},
+				error: function(data){
+				}
 		});
+	});
 });
 	

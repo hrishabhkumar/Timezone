@@ -10,11 +10,11 @@
 		    <a href="/" class="navbar-brand">Timezone-Adaptavant</a>
 		    <div class="collapse navbar-collapse navHeaderCollapse">
 			    <ul class="nav navbar-nav navbar-right">
-			    	<li class="active"><a href="/home.html">Home</a></li>
-			    	<%if(session.getAttribute("key")==null){ %><li ><a href="/login.html" data-toggle="modal">Login</a></li><%} %>
-			    	<%if(session.getAttribute("key")==null){ %><li ><a href="/register.html" data-toggle="modal">Register</a></li><%} %>
-				   <%if(session.getAttribute("key")!=null){ %> <li><a href="/timezone.html">Timezone</a></li><%} %>
-				   <%if(session.getAttribute("key")!=null){ %> <li><a href="/logout.html">Logout</a></li><%} %>
+			    	<%if(session.getAttribute("key")!=null){ %><li id="home"><a href="/home.html">Home</a></li><%} %>
+			    	<%if(session.getAttribute("key")==null){ %><li id="login"><a href="/login.html" >Login</a></li><%} %>
+			    	<%if(session.getAttribute("key")==null){ %><li id=register><a href="/register.html" >Register</a></li><%} %>
+				   <%if(session.getAttribute("key")!=null){ %> <li id=timezone><a href="/timezone.html">Timezone</a></li><%} %>
+				   <%if(session.getAttribute("key")!=null){ %> <li id=logout><a href="/logout.html">Logout</a></li><%} %>
 			    </ul>
 	    
 	    	</div>

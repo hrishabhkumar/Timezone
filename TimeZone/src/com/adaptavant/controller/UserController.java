@@ -31,7 +31,7 @@ public class UserController {
 	
 	@RequestMapping(value="/login", method=RequestMethod.GET)
 	public String loginURL(HttpServletRequest req, HttpServletResponse resp){
-		return "index";
+		return "login";
 	}
 	@RequestMapping(value="/register", method=RequestMethod.GET)
 	public String registerURL(HttpServletRequest req, HttpServletResponse resp){
@@ -44,7 +44,7 @@ public class UserController {
 		response.setHeader("Cache-Control","no-store");
 		response.setHeader("Pragma","no-cache");
 		response.setDateHeader ("Expires", 0);
-		return "index";
+		return "login";
 	}
 	
 	@SuppressWarnings("unchecked")
