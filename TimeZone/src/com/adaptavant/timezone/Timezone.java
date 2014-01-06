@@ -23,7 +23,7 @@ public class Timezone {
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();
 		System.out.println(key);
 		CustomerJDO customer= pm.getObjectById(CustomerJDO.class, key);
-		String keyString=KeyFactory.createKeyString(TimezoneJDO.class.getSimpleName(), city+state+country);
+		String keyString="getTimeZoneDataOf"+city+state+country;
 		if(MCacheService.get(keyString)!=null){
 			int requests=customer.getRequests();
 			requests++;

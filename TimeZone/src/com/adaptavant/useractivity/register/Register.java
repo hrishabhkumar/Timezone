@@ -17,10 +17,10 @@ import com.google.appengine.api.datastore.KeyFactory;
 public class Register {
 	HttpSession session;
 	PersistenceManager pm = PMF.getPMF().getPersistenceManager();
+	CustomerJDO customer=new CustomerJDO();
 	public String addUser(HttpSession session, String email, String password) {
 		try {
 			String keyString = KeyFactory.createKeyString(CustomerJDO.class.getSimpleName(), email);
-			CustomerJDO customer=new CustomerJDO();
 			customer.setKey(keyString);
 			customer.setEmail(email);
 			customer.setPassword(password);
@@ -38,5 +38,17 @@ public class Register {
 		}
 		
 	   
+	}
+	public boolean alreadyRegisterd(String email) {
+		try{
+			String keyString = KeyFactory.createKeyString(CustomerJDO.class.getSimpleName(), email);
+			pm.getObjectById(CustomerJDO.class, keyString);
+			return true;
+		}
+		catch(Exception e){
+			return false;
+		}
+		
+		
 	}
 }

@@ -1,11 +1,11 @@
 $(document).ready(function(){
-	function validatelogin(){
+	function validate(){
 		var regemail = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
 		var email=$ ('#userid').val();
 		var pass=$ ('#password').val();
 		if(regemail.test(email)){
 			$('#useridSpan').empty();
-			if(pass.length==6){
+			if(pass.length>=6){
 				$('#passwordSpan').empty();
 				return true;
 			}
@@ -19,11 +19,22 @@ $(document).ready(function(){
 			return false;
 		}
 	}
+	$('#userid').on({
+	    keyup: function(){
+		validate()
+	}
+	});
+	$('#password').on({
+	    keyup: function(){
+		validate()
+	}
+	});
+	
 	//Sending Login data and receiving Key and Status.
 	$ (function(){
 		$('#loginForm').submit(function(event){
 			event.preventDefault();
-			if(validatelogin()){
+			if(validate()){
 			var dataString={
 					userid: $('#userid').val(),
 					password: $('#password').val()
@@ -69,41 +80,41 @@ $(document).ready(function(){
 	$ (function(){
 		$('#registerForm').submit(function(event){
 			event.preventDefault();
-			if(validatelogin()){
-			var dataString={
-					userid: $('#userid').val(),
-					password: $('#password').val()
-					};
-			
-			dataString=JSON.stringify(dataString);
-			$.ajax({
-				url: "register",
-				type: "post",
-				dataType: "json",
-				contentType: "application/json",
-				data: dataString,
-				async: false,
-				cache: false,
-				processData:false,
-				success: function(data){
-					if(data.status=="success"){
-						alert("Registration Successfull!!!! Please Wait while we redirect you to homepage.");
-						window.location.href = "/home";
-					}
-					else{
-						$('#registerFailed').fadeIn(5000);
-						$('#registerFailed').text("Registration Failed!!!! Please Check You Username and Password");
-						$('#registerFailed').fadeOut(5000);
-						
-					}
-			      },
-			    error: function(data){
-			    }
-			});
+			if(validate()){
+				var dataString={
+						userid: $('#userid').val(),
+						password: $('#password').val()
+						};
+				dataString=JSON.stringify(dataString);
+				$.ajax({
+					url: "register",
+					type: "post",
+					dataType: "json",
+					contentType: "application/json",
+					data: dataString,
+					async: false,
+					cache: false,
+					processData:false,
+					success: function(data){
+						if(data.status=="success"){
+							$('#registerFailed').html("Registration Successfull!!!! Please Wait while we redirect you to homepage.").css("color", "green");
+							$('#registerFailed').fadeOut(3000);
+							window.setTimeout(function() {window.location.href = '/home';}, 1000);
+						}
+						else{
+							$('#registerFailed').fadeIn(5000);
+							$('#registerFailed').html(data.error).css("color", "red");
+							$('#registerFailed').fadeOut(5000);
+							
+						}
+				      },
+				    error: function(data){
+				    }
+				});
 			}
 			else{
 				$('#registerFailed').fadeIn(5000);
-				$('#registerFailed').text("Registration Failed!!!! Please Check You Username and Password");
+				$('#registerFailed').html("Registration Failed!!!! Please Check You Username and Password").css("color", "red");
 				$('#registerFailed').fadeOut(5000);
 			}
 		});

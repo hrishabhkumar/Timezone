@@ -27,6 +27,7 @@ $(document).ready(function(){
     			<div class="container">
     			Please fill following details: 
 	    			<form action="#"  class="form-horizontal" role=form id="registerForm">
+	    			<span id=registerFailed></span>
 	    			 	<div class="form-group">
 	    			 	<div class="col-xs-4">
 	    			 		<label for="username">User Name:</label>

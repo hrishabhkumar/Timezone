@@ -1,10 +1,19 @@
+/**
+ * 
+ */
 package com.adaptavant.timezone.services;
 
-
+/**
+ * @author Hrishabh.Kumar
+ *
+ */
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheFactory;
@@ -32,7 +41,6 @@ public class MCacheService {
 			return null;
 		}
 	}
-
 	public static boolean set(String key,Object obj) {
 		Cache cache= getCacheInstance();
 		if(cache==null)
@@ -61,5 +69,13 @@ public class MCacheService {
 			return false;
 		return cache.containsKey(key);
 	}
+	
+	public static boolean removeAll(){
+		Cache cache= getCacheInstance();
+		cache.remove(cache);
+		System.out.println("cache removed");
+		return true;
+	}
 
 }
+
