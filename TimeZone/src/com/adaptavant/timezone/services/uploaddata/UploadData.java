@@ -8,6 +8,8 @@ import java.util.StringTokenizer;
 
 import javax.jdo.PersistenceManager;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.timezone.TimezoneJDO;
 import com.google.appengine.api.taskqueue.Queue;
@@ -33,16 +35,16 @@ public class UploadData {
 					token=new StringTokenizer(line, "\t");
 					time=new TimezoneJDO();
 				while(token.hasMoreTokens()){
-					String country=token.nextToken().replace("\"", "");
+					String country=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 					System.out.println(token.countTokens());
-					String state=token.nextToken().replace("\"", "");
-					String city=token.nextToken().replace("\"", "");
-					String latitude=token.nextToken().replace("\"", "");
-					String longitude=token.nextToken().replace("\"", "");
+					String state=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+					String city=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+					String latitude=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+					String longitude=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 					@SuppressWarnings("unused")
 					String countryCode=token.nextToken().replace("\"", "");
-					String timeZone=token.nextToken().replace("\"", "");
-					String rawOffsetstr=token.nextToken().replace("\"", "");
+					String timeZone=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+					String rawOffsetstr=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 					System.out.println(rawOffsetstr);
 					int sign=rawOffsetstr.substring(0,1).toCharArray()[0];
 					int hours=Integer.parseInt(rawOffsetstr.substring(1, rawOffsetstr.indexOf(":")))*1000*60*60;

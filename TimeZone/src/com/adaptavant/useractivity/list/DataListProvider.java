@@ -22,12 +22,17 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.datanucleus.query.JDOCursorHelper;
 
-
+@SuppressWarnings("unchecked")
 public class DataListProvider {
 	Logger logger=Logger.getLogger("DataListProvider");
 	JSONArray array=new JSONArray();
-	@SuppressWarnings("unchecked")
-	public synchronized void getCountryList(int limit,String cursorString){
+	
+/*
+ * This method will get country list from database and store it in memcache. 
+ * 
+ * It will be called only if it is not available in memcache.
+ */
+	public void getCountryList(int limit,String cursorString){
 		String keyString="CountryList";
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
 		Query query = pm.newQuery(TimezoneJDO.class);
@@ -66,12 +71,17 @@ public class DataListProvider {
 						MCacheService.remove(keyString);
 					} 
 				}
-			} 
+			}
 			finally {
 			  query.closeAll();
 			}
 		}
-	@SuppressWarnings("unchecked")
+	/*
+	 * This method will return JSON Array of State and also store it in memcache after taking Country name from user.
+	 * 
+	 * It will be called only if state list is not available in memcache.
+	 */
+	
 	public JSONArray getStateList(String country, int limit, String cursorString){
 		String keyString="getStateList1"+country;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
@@ -119,7 +129,12 @@ public class DataListProvider {
 		return array;		
 	}
 	
-	@SuppressWarnings("unchecked")
+	/*
+	 * This method will return JSON Array of city list after taking Country name and State name from user.
+	 * 
+	 * It will be called only if city list is not available in memcache.
+	 */
+
 	public JSONArray getCityList(String country, String state){
 		String keyString="getCityList"+country+"and"+state;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
@@ -130,10 +145,10 @@ public class DataListProvider {
 		else{
 		Query query = pm.newQuery(TimezoneJDO.class, "country == '"+country+"'&& state == '"+state+"'");
 		query.setResult ("distinct city");
-		System.out.println(query.toString());
+		 logger.info(query.toString());
 		try {
 		  Collection<?> results = (Collection<?>)query.execute (); 
-		  System.out.println(query.execute());
+		  logger.info(query.execute().toString());
 		  if (!results.isEmpty()) {
 			  Collection<String> city=new TreeSet<String>();
 			  city.addAll((Collection<? extends String>) results);

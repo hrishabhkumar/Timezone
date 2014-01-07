@@ -8,9 +8,7 @@ package com.adaptavant.timezone.services;
  *
  */
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,7 +70,7 @@ public class MCacheService {
 	
 	public static boolean removeAll(){
 		Cache cache= getCacheInstance();
-		cache.remove(cache);
+		cache.clear();
 		System.out.println("cache removed");
 		return true;
 	}

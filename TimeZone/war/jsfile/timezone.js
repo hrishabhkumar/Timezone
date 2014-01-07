@@ -23,8 +23,9 @@ $(document).ready(function(){
 							$('#seachButton').attr("disabled",false)
 						}
 					}
-					else{
+					else if(data.status=="wait"){
 						$('#result').html("<h1>Please wait...</h1>");
+						ajax_call(name, dataString);
 					}
 			      },
 			    error: function(data){

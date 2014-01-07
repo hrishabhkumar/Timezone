@@ -5,14 +5,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.adaptavant.timezone.services.MCacheService;
+import com.adaptavant.adminactivity.UpdateData;
 import com.adaptavant.useractivity.login.Login;
 import com.adaptavant.useractivity.register.Register;
 
@@ -29,17 +28,18 @@ public class UserController {
 	}
 	@RequestMapping(value="/admin", method=RequestMethod.GET)
 	public String adminURL(){
-		MCacheService.removeAll();
 		return "admin";
 	}
 	
-	@RequestMapping(value="/admin", method=RequestMethod.GET)
+	@RequestMapping(value="/admin", method=RequestMethod.POST)
 	public @ResponseBody String adminURL(@RequestBody String timezonedata){
 		try {
 			JSONObject data=(JSONObject) parser.parse(timezonedata);
 			if(data.get("opreq").toString().equals("update")){
-				JSONObject timeZoneData=(JSONObject) data.get("timezonedata");
-				
+				JSONObject oldTimeZoneData=(JSONObject) data.get("oldtimezonedata");
+				JSONObject newTimeZoneData=(JSONObject) data.get("newtimezonedata");
+				UpdateData updateData=new UpdateData();
+				updateData.changeData(oldTimeZoneData, newTimeZoneData);
 			}
 		} catch (Exception e) {
 			return null;
@@ -70,27 +70,38 @@ public class UserController {
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/login", method=RequestMethod.POST, produces = "application/json", consumes = "application/json")
-	public @ResponseBody String loginAction(HttpServletRequest req, @RequestBody String json) throws ParseException{
+	public @ResponseBody String loginAction(HttpServletRequest req, @RequestBody String json){
 		System.out.println(json);
-		JSONObject jsonObject=(JSONObject) parser.parse(json);
-		Login login=new Login();
-		String key=login.login(req.getSession(), jsonObject.get("userid").toString(), jsonObject.get("password").toString());
-		jsonObject=new JSONObject();
-		if(key!=null){
-			jsonObject.put("status", "success");
-			jsonObject.put("key", key);
+		try{
+			JSONObject jsonObject=(JSONObject) parser.parse(json);
+			Login login=new Login();
+			String key=login.login(req.getSession(), jsonObject.get("userid").toString(), jsonObject.get("password").toString());
+			jsonObject=new JSONObject();
+			if(key!=null){
+				jsonObject.put("status", "success");
+				jsonObject.put("key", key);
+			}
+			else{
+				jsonObject.put("status", "failed");
+				jsonObject.put("key", null);
+				jsonObject.put("error", "Your are registered. Please register to use timezone");
+			}
+			System.out.println(jsonObject.toJSONString());
+			return jsonObject.toJSONString();
 		}
-		else{
+		catch(Exception e){
+			JSONObject jsonObject=new JSONObject();
 			jsonObject.put("status", "failed");
 			jsonObject.put("key", null);
+			jsonObject.put("error", "Your data is not in correct format");
+			return jsonObject.toJSONString();
 		}
-		System.out.println(jsonObject.toJSONString());
-		return jsonObject.toJSONString();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/register", method=RequestMethod.POST)
-	public @ResponseBody String registerAction(HttpServletRequest req, @RequestBody String json) throws ParseException{
+	public @ResponseBody String registerAction(HttpServletRequest req, @RequestBody String json){
+		try{
 		JSONObject jsonObject=(JSONObject) parser.parse(json);
 		Register register=new Register();
 		if(jsonObject.get("userid").toString().matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[-A-Za-z0-9]+(\\.[A-Za-z]{1,})+$")&&jsonObject.get("password").toString().length()>=6){
@@ -123,6 +134,14 @@ public class UserController {
 			jsonObject.put("status", "failed");
 			jsonObject.put("key", null);
 			jsonObject.put("error", "User ID must be email, and Password must have atleast 6 character");
+			return jsonObject.toJSONString();
+		}
+		}
+		catch(Exception e){
+			jsonObject=new JSONObject();
+			jsonObject.put("status", "failed");
+			jsonObject.put("key", null);
+			jsonObject.put("error", "Your data is not in correct format");
 			return jsonObject.toJSONString();
 		}
 	}

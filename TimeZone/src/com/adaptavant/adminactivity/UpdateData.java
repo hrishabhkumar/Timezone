@@ -12,11 +12,9 @@ import javax.jdo.Query;
 import org.json.simple.JSONObject;
 
 import com.adaptavant.jdo.PMF;
-import com.adaptavant.jdo.customer.CustomerJDO;
 import com.adaptavant.jdo.timezone.TimezoneJDO;
 import com.adaptavant.timezone.services.MCacheService;
 import com.adaptavant.useractivity.list.DataListProvider;
-import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * @author Hrishabh.Kumar
@@ -41,7 +39,6 @@ public class UpdateData {
 		String latitude=newtimezonedata.get("latitude").toString();
 		
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();
-		String keyString=KeyFactory.createKeyString(TimezoneJDO.class.getSimpleName(), city+state+country);
 		Query query = pm.newQuery(TimezoneJDO.class,
                 " city == '"+oldTimeZoneData.get("city").toString()+"' && state == '" +
                 oldTimeZoneData.get("state").toString()+"' "
@@ -52,50 +49,33 @@ public class UpdateData {
 		try {
 		  @SuppressWarnings("unchecked")
 		  List<TimezoneJDO> results = (List<TimezoneJDO>) query.execute();
-		  TimezoneJDO timeZoneJDO=new TimezoneJDO();
-		  timeZoneJDO.setCity(city);
-		  timeZoneJDO.setCountry(country);
-		  timeZoneJDO.setDstOffset(dstOffset);
-		  timeZoneJDO.setLatitude(latitude);
-		  timeZoneJDO.setLongitude(longitude);
-		  timeZoneJDO.setRawOffset(rawOffset);
-		  timeZoneJDO.setState(state);
-		  timeZoneJDO.setTimeZoneId(timeZoneID);
-		  timeZoneJDO.setTimeZoneName(timeZoneName);
-		  System.out.println(results);
-		  if (!results.isEmpty()) {
-			  StringBuilder sb=new StringBuilder();
-			  String str;
-			  
-				  str="{\"city\":\""+timeZoneJDO.getCity()+"\" ,\n"
-				  		+ "\"state\":\""+timeZoneJDO.getState()+"\" , \n"
-						  +"\"country\":\""+timeZoneJDO.getCountry()+"\" , \n"+
-						  "\"longitude\":\""+timeZoneJDO.getLongitude()+"\" , \n"+
-						  "\"latitude\":\""+timeZoneJDO.getLatitude()+"\" , \n"+
-						  "\"timeZoneID\":\""+timeZoneJDO.getTimeZoneId()+"\" , \n"+
-						  "\"timeZoneName\":\""+timeZoneJDO.getTimeZoneName()+"\" , \n"+
-						  "\"rawOffset\":\""+timeZoneJDO.getRawOffset()+"\" , \n"+
-						  "\"dstOffset\":\""+timeZoneJDO.getDstOffset()+"\" , \n"+
-						  "}"; 
-			 str="{\"data\": ["+str+"]}";
-			 MCacheService.set(keyString, str);
-			 if(!oldTimeZoneData.get("country").toString().equals(country)){
-				 DataListProvider dld=new DataListProvider();
-				 dld.getCountryList(1000, null);
-			 }
-			 if(!oldTimeZoneData.get("state").toString().equals(state)){
-				MCacheService.remove("getStateList"+oldTimeZoneData.get("country").toString());			 
-			 }
-			 if(!oldTimeZoneData.get("city").toString().equals(city)){
-				 MCacheService.remove("getCityList"+oldTimeZoneData.get("country").toString()+"and"+oldTimeZoneData.get("state").toString());
-				 MCacheService.remove("getTimeZoneDataOf"+oldTimeZoneData.get("city").toString()+oldTimeZoneData.get("state").toString()+oldTimeZoneData.get("country").toString());
-			 }
-			 return str;
-		  } 
-		  else {
-		    return "{\"data\": [\"data not found.\"]}";
+		  
+		  if (!results.isEmpty()){
+			TimezoneJDO timeZoneJDO=results.get(0);
+			timeZoneJDO.setCity(city);
+			timeZoneJDO.setCountry(country);
+			timeZoneJDO.setDstOffset(dstOffset);
+			timeZoneJDO.setLatitude(latitude);
+			timeZoneJDO.setLongitude(longitude);
+			timeZoneJDO.setRawOffset(rawOffset);
+			timeZoneJDO.setState(state);
+			timeZoneJDO.setTimeZoneId(timeZoneID);
+			timeZoneJDO.setTimeZoneName(timeZoneName);
+			System.out.println(results);
+			MCacheService.removeAll();
+			DataListProvider dld=new DataListProvider();
+			dld.getCountryList(1000, null);
+			 return "success";
+		 }
+		 else{
+			 return "failed";
 		  }
-		} finally {
+		} 
+		catch(Exception e){
+		  return "failed";
+		}
+			
+		finally {
 		  query.closeAll();
 		}
 	}
