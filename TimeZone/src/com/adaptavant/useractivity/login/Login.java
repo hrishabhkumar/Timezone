@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.customer.CustomerJDO;
+import com.adaptavant.timezone.services.TextEncription;
 import com.google.appengine.api.datastore.KeyFactory;
 
 /**
@@ -28,7 +29,6 @@ public class Login {
 				System.out.println("null value");
 				return null;
 			}
-				
 			else {
 				PersistenceManager pm = PMF.getPMF().getPersistenceManager();
 				try{
@@ -36,7 +36,7 @@ public class Login {
 					System.out.println("Got Key: "+keyString);
 					CustomerJDO customer= pm.getObjectById(CustomerJDO.class, keyString);
 					
-					if(email.equals(customer.getEmail())&& password.equals(customer.getPassword())){
+					if(email.equals(customer.getEmail())&& TextEncription.sha1(password).equals(customer.getPassword())){
 						System.out.println("value for req  "+email);
 						Date lastLogin=customer.getLastLogin();
 						Date currentTime=new Date();

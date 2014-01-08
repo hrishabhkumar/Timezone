@@ -25,7 +25,6 @@ $(document).ready(function(){
 					}
 					else if(data.status=="wait"){
 						$('#result').html("<h1>Please wait...</h1>");
-						ajax_call(name, dataString);
 					}
 			      },
 			    error: function(data){
@@ -124,12 +123,18 @@ $(document).ready(function(){
 							
 							output+='<div class="form-group"><label class="col-sm-3 control-label">Country :</label>';
 							output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].country+'</p></div></div>';
+
+							output+='<div class="form-group"><label class="col-sm-3 control-label">Country Code :</label>';
+							output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].countryCode+'</p></div></div>';
 							
 							output+='<div class="form-group"><label class="col-sm-3 control-label">State:</label>';
 							output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].state+'</p></div></div>';
 							
 							output+='<div class="form-group"><label class="col-sm-3 control-label">City:</label>';
 							output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].city+'</p></div></div>';
+
+							output+='<div class="form-group"><label class="col-sm-3 control-label">Zip Code:</label>';
+							output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].zipCode+'</p></div></div>';
 							
 							output+='<div class="form-group"><label class="col-sm-3 control-label">Longitude:</label>';
 							output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].longitude+'</p></div></div>';

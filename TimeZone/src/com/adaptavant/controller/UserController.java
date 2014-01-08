@@ -84,7 +84,7 @@ public class UserController {
 			else{
 				jsonObject.put("status", "failed");
 				jsonObject.put("key", null);
-				jsonObject.put("error", "Your are registered. Please register to use timezone");
+				jsonObject.put("error", "Your are not registered. Please register to use timezone");
 			}
 			System.out.println(jsonObject.toJSONString());
 			return jsonObject.toJSONString();

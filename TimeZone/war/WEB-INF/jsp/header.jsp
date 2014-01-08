@@ -1,5 +1,3 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
     <div class="navbar navbar-inverse navbar-static-top"> 
 	    <div class="container">
 		    <button class="navbar-toggle" data-toggle="collapse" data-target=".navHeaderCollapse">

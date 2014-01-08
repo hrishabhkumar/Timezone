@@ -37,7 +37,7 @@ public class TimezoneJDO {
 	@Persistent
 	private String state;
 	
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+	@Persistent
 	private String city;
 	
 	@Persistent
@@ -50,6 +50,11 @@ public class TimezoneJDO {
 	@Persistent
 	private String latitude;
 	
+	@Persistent
+	private String countryCode;
+	
+	@Persistent
+	private String zipCode;
 	
 	/**
 	 * @return the key
@@ -209,6 +214,38 @@ public class TimezoneJDO {
 	 */
 	public void setLatitude(String latitude) {
 		this.latitude = latitude;
+	}
+
+
+	/**
+	 * @return the countryCode
+	 */
+	public String getCountryCode() {
+		return countryCode;
+	}
+
+
+	/**
+	 * @param countryCode the countryCode to set
+	 */
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
+	}
+
+
+	/**
+	 * @return the zipCode
+	 */
+	public String getZipCode() {
+		return zipCode;
+	}
+
+
+	/**
+	 * @param zipCode the zipCode to set
+	 */
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
 	}
 
 

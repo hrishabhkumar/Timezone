@@ -23,7 +23,7 @@ public class CustomerJDO {
 	private String password;
 	
 	@Persistent
-	private int requests;
+	private int requests=0;
 	
 	@Persistent
 	private Date lastLogin;

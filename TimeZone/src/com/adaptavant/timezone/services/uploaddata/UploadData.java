@@ -21,7 +21,7 @@ public class UploadData {
 		StringTokenizer token = null;
 		BufferedReader br = null;
 		String line=null;
-		String str="db.txt";
+		String str="db.csv";
 		PersistenceManager pm1 = PMF.getPMF().getPersistenceManager();
 		TimezoneJDO time;
 		Collection<TimezoneJDO> timeobj=new ArrayList<TimezoneJDO>();
@@ -41,10 +41,11 @@ public class UploadData {
 					String city=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 					String latitude=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 					String longitude=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
-					@SuppressWarnings("unused")
-					String countryCode=token.nextToken().replace("\"", "");
+					
+					String countryCode=token.nextToken().replace("\"", "").toUpperCase();
 					String timeZone=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 					String rawOffsetstr=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+					
 					System.out.println(rawOffsetstr);
 					int sign=rawOffsetstr.substring(0,1).toCharArray()[0];
 					int hours=Integer.parseInt(rawOffsetstr.substring(1, rawOffsetstr.indexOf(":")))*1000*60*60;
@@ -69,6 +70,7 @@ public class UploadData {
 					else{
 						dstOffset=+(hours+min);  
 					}
+					String zipCode=token.nextToken().replace("\"", "");
 					
 					time.setCountry(country);
 					time.setCity(city);
@@ -78,7 +80,9 @@ public class UploadData {
 					time.setTimeZoneId(timeZone);
 					time.setTimeZoneName(timeZone.substring(timeZone.lastIndexOf('/')+1));
 					time.setLatitude(latitude);
-					time.setLongitude(longitude);					
+					time.setLongitude(longitude);
+					time.setCountryCode(countryCode);
+					time.setZipCode(zipCode);
 				}
 				timeobj.add(time);
 				}
@@ -86,7 +90,7 @@ public class UploadData {
 				pm1.makePersistentAll(timeobj);
 				pm1.close();
 				Queue queue=QueueFactory.getDefaultQueue();
-				queue.add(TaskOptions.Builder.withUrl("/countrylist").param("limit", "1000"));
+				queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "country").taskName("getCountry2_"));
 				
 			}
 		catch (Exception e) {
