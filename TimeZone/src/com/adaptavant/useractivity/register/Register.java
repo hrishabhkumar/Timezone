@@ -21,6 +21,14 @@ public class Register {
 	HttpSession session;
 	PersistenceManager pm = PMF.getPMF().getPersistenceManager();
 	CustomerJDO customer=new CustomerJDO();
+	/**
+	 * 
+	 * @param session
+	 * @param email
+	 * @param password
+	 * @return Key
+	 * This method is used for user registration.
+	 */
 	public String addUser(HttpSession session, String email, String password) {
 		try {
 			String keyString = KeyFactory.createKeyString(CustomerJDO.class.getSimpleName(), email);

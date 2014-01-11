@@ -1,45 +1,47 @@
 $(document).ready(function(){
-	function validate(){
+	function validateEmail(){
 		var regemail = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
 		var email=$ ('#userid').val();
-		var pass=$ ('#password').val();
+		
 		if(regemail.test(email)){
 			$('#useridSpan').empty();
-			if(pass.length>=6){
-				$('#passwordSpan').empty();
-				return true;
-			}
-			else{
-				$('#passwordSpan').html("Password is too short.(length must be atleast 6)").css("color", "red");
-				return false;
-			}
+			return true;
 		}
 		else{
 			$('#useridSpan').html("User Name must be a email address").css("color", "red");
 			return false;
 		}
 	}
+	function validatePassword(){
+		var pass=$ ('#password').val();
+		if(pass.length>=6){
+			$('#passwordSpan').empty();
+			return true;
+		}
+		else{
+			$('#passwordSpan').html("Password is too short.(length must be atleast 6)").css("color", "red");
+			return false;
+		}
+	}
 	$('#userid').on({
 	    keyup: function(){
-		validate()
+		validateEmail()
 	}
 	});
 	$('#password').on({
 	    keyup: function(){
-		validate()
+		validatePassword()
 	}
 	});
 	
 	//Sending Login data and receiving Key and Status.
-	$ (function(){
 		$('#loginForm').submit(function(event){
 			event.preventDefault();
-			if(validate()){
+			if(validateEmail()&&validatePassword()){
 			var dataString={
 					userid: $('#userid').val(),
 					password: $('#password').val()
 					};
-			
 			dataString=JSON.stringify(dataString);
 			console.log(dataString) ;
 			$.ajax({
@@ -57,7 +59,7 @@ $(document).ready(function(){
 					}
 					else{
 						$('#loginFailed').fadeIn(5000);
-						$('#loginFailed').text("Login Failed!!!! Please Check You Username and Password");
+						$('#loginFailed').html("Login Failed!!!! Please Check You Username and Password").css("color", "red");
 						$('#loginFailed').fadeOut(5000);
 						
 					}
@@ -68,19 +70,16 @@ $(document).ready(function(){
 			}
 			else{
 				$('#loginFailed').fadeIn(5000);
-				$('#loginFailed').text("Login Failed!!!! Please Check You Username and Password");
+				$('#loginFailed').html("Login Failed!!!! Please Check You Username and Password").css("color", "red");
 				$('#loginFailed').fadeOut(5000);
 			}
 		});
 		
-	});
-	
-	
 	//Sending Registration data and receiving Key and Status.
-	$ (function(){
+	
 		$('#registerForm').submit(function(event){
 			event.preventDefault();
-			if(validate()){
+			if(validateEmail()&&validatePassword()){
 				var dataString={
 						userid: $('#userid').val(),
 						password: $('#password').val()
@@ -118,5 +117,5 @@ $(document).ready(function(){
 				$('#registerFailed').fadeOut(5000);
 			}
 		});
-	});
+		
 });

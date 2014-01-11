@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.adaptavant.converter.TimezoneListProvider;
 import com.adaptavant.timezone.Timezone;
 import com.adaptavant.timezone.services.MCacheService;
 import com.adaptavant.timezone.services.uploaddata.UploadData;
@@ -31,7 +32,15 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 @SuppressWarnings("unchecked")
 public class TimezoneController {
 	Logger logger=Logger.getLogger("TimezoneController");
-	
+	JSONParser parser=new JSONParser();
+	/**
+	 * 
+	 * @param req(country,state, city)
+	 * @param resp
+	 * @return timezone data
+	 * this is rest client url will used to find time zone data using 
+	 * country name, state name and/or city name
+	 */
 	@RequestMapping(value="/timezone",params={"country", "state"}, method=RequestMethod.GET)
 	public @ResponseBody String countryStateCity(HttpServletRequest req, HttpServletResponse resp){
 		String key=(String) req.getSession().getAttribute("key");
@@ -52,7 +61,14 @@ public class TimezoneController {
 			return "please login..";
 		}
 	}
-	
+	/**
+	 * 
+	 * @param req(countryCode, state name)
+	 * @param resp
+	 * @return timezone data
+	 * this is rest client URL will used to find time zone data using 
+	 * country code and state name
+	 */
 	@RequestMapping(value="/timezone",params={"countryCode", "state"}, method=RequestMethod.GET)
 	public @ResponseBody String countryCodeState(HttpServletRequest req, HttpServletResponse resp){
 		String key=(String) req.getSession().getAttribute("key");
@@ -71,6 +87,13 @@ public class TimezoneController {
 			return "please login..";
 		}
 	}
+	/**
+	 * 
+	 * @param req(zipcode)
+	 * @param resp
+	 * @return timezone data
+	 * this is rest client URL will used to find time zone data using only zip code of city
+	 */
 	@RequestMapping(value="/timezone",params={"zipcode"}, method=RequestMethod.GET)
 	public @ResponseBody String zipCode(HttpServletRequest req, HttpServletResponse resp){
 		String key=(String) req.getSession().getAttribute("key");
@@ -86,8 +109,14 @@ public class TimezoneController {
 		else{
 			return "please login..";
 		}
-		
 	}
+	/**
+	 * 
+	 * @param req(longitude, latitude)
+	 * @param resp
+	 * @return timezone data
+	 * this is rest client URL will used to find time zone data using only longitude and latitude
+	 */
 	@RequestMapping(value="/timezone",params={"longitude", "latitude"}, method=RequestMethod.GET)
 	public @ResponseBody String longitudeLatitude(HttpServletRequest req, HttpServletResponse resp){
 		String key=(String) req.getSession().getAttribute("key");
@@ -106,15 +135,25 @@ public class TimezoneController {
 			return "please login..";
 		}
 	}
+	/**
+	 * 
+	 * @return timezone page
+	 */
 	@RequestMapping(value="/timezone", method=RequestMethod.GET)
 	public String timezoneURL(){
 		return "timezone";
 	}
+	/**
+	 * 
+	 * @param req
+	 * @param timezonejson(key,(city,state,country)or(countryCode, state)or(zipCode)or(longitude,latitude))
+	 * @return timezonedata
+	 * This method will retrieve timezonejson data and give response as timezone data in json format.
+	 */
 	@RequestMapping(value="/timezone", method=RequestMethod.POST)
 	public @ResponseBody String timezoneAction( HttpServletRequest req,@RequestBody String timezonejson) {
 		try{
 			logger.info(timezonejson);
-			JSONParser parser=new JSONParser();
 			JSONObject jsonObject=(JSONObject) parser.parse(timezonejson);
 			String key;
 			String city;
@@ -219,20 +258,34 @@ public class TimezoneController {
 		}
 		
 	}
-	
+	/**
+	 * 
+	 * @param req
+	 * @param resp
+	 * this is temporary url.
+	 */
 	@RequestMapping("/uploaddata")
 	public void uploadTime(HttpServletRequest req, HttpServletResponse resp){
 		UploadData uploadData=new UploadData();
 		uploadData.uploadTime();
 	}
-	
+	/**
+	 * 
+	 * @param req
+	 * @param listRequired
+	 * @return countryList
+	 * @return stateList(according to country)
+	 * @return cityList(according to state and country)
+	 * @return timezone data with current server time
+	 * 
+	 */
 	@RequestMapping(value="/getList")
-	public @ResponseBody String getList(HttpServletRequest req, @RequestBody String json){
+	public @ResponseBody String getList(HttpServletRequest req, @RequestBody String listRequired){
 		JSONParser parser=new JSONParser();
 		JSONObject jsonObject;
 		try {
-			logger.info(json);
-			jsonObject=(JSONObject) parser.parse(json);
+			logger.info(listRequired);
+			jsonObject=(JSONObject) parser.parse(listRequired);
 			DataListProvider dlp=new DataListProvider();
 			if(jsonObject.get("required").toString().equals("country")){
 				logger.info("inside country");
@@ -311,17 +364,45 @@ public class TimezoneController {
 			return jsonObject.toJSONString();
 		}
 	}
-	DataListProvider dlp=new DataListProvider();
+	/**
+	 * 
+	 * @param req
+	 * @param resp
+	 * this URL is used to retrieve large state list or country list via queue. 
+	 */
 	@RequestMapping("/list")
 	public void getlist(HttpServletRequest req, HttpServletResponse resp){
+		DataListProvider dlp=new DataListProvider();
 		int limit=Integer.parseInt(req.getParameter("limit"));
 		String cursorString=req.getParameter("cursorString");
-		
 		if(req.getParameter("list").equals("country")){
 			dlp.getCountryList(limit, cursorString);
 		}
 		else if(req.getParameter("list").equals("state")){
 			dlp.getStateList(req.getParameter("country"), limit, cursorString);
 		}
+		else if(req.getParameter("list").equals("timezoneID")){
+			TimezoneListProvider listprovider=new TimezoneListProvider();
+			listprovider.getTimezoneIDList(limit, cursorString);
+		}
+	}
+	
+	@RequestMapping(value="/converter",method=RequestMethod.GET )
+	public String converterURL(){
+		return "timezoneConverter";
+	}
+	@RequestMapping(value="/converter",method=RequestMethod.POST )
+	public @ResponseBody String converter(@RequestBody String reqired){
+		logger.info(reqired);
+		try {
+			JSONObject requirment=(JSONObject) parser.parse(reqired);
+			if(requirment.get("required").toString().equals("timezonenames")){
+				TimezoneListProvider timezoneListProvider=new TimezoneListProvider();
+				return timezoneListProvider.getTimezoneIDList(1000, null);
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

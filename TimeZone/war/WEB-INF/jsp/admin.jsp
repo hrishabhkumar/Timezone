@@ -24,6 +24,15 @@
      </script>
 </head>
 <body>
+	<%
+	 response.setHeader("Cache-Control", "no-cache");
+	 response.setHeader("Cache-Control", "no-store");
+	 response.setDateHeader("Expires", 0);
+	 response.setHeader("Pragma", "no-cache");
+	 if (session.getAttribute("key") == null ) {
+	  response.sendRedirect("/login");
+	 }
+	%>
 	<jsp:include page="header.jsp"></jsp:include>
 		<div class="container" >
 			<h1>Please Select Country, State and City to get time of particular place.</h1>

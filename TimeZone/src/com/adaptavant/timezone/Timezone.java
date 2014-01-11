@@ -21,9 +21,17 @@ import com.adaptavant.timezone.services.MCacheService;
  *
  */
 public class Timezone {
-	/*
-	 * This method will return Timezone data as JSON String.
-	 * User Key, State name, Country Name and City Name are Mandatory.
+	/**
+	 * 
+	 * @param key
+	 * @param city
+	 * @param state
+	 * @param country
+	 * @param countryCode
+	 * @param zipCode
+	 * @param latitude
+	 * @param longitude
+	 * @return Timezone data as JSON String.
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject getTimezoneData(String key, String city, String state, String country, String countryCode, String zipCode, String latitude, String longitude){

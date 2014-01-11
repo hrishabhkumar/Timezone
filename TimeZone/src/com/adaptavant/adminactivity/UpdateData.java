@@ -21,12 +21,14 @@ import com.adaptavant.useractivity.list.DataListProvider;
  *	This Class is will used to change or delete the data of TimeZoneJDO.
  */
 public class UpdateData {
-	/**
-	 * This method will used to update TimeZone data.
-	 * Whole TimeZone data will retrieved as a jsonObject.
-	 */
 	Logger logger=Logger.getLogger(UpdateData.class.getName());
-	
+	/**
+	 * 
+	 * @param oldTimeZoneData
+	 * @param newtimezonedata
+	 * @return status
+	 *  This method will used to update TimeZone data.
+	 */
 	public String changeData(JSONObject oldTimeZoneData, JSONObject newtimezonedata){
 		String timeZoneID=newtimezonedata.get("timeZoneID").toString();
 		String timeZoneName=newtimezonedata.get("timeZoneName").toString();

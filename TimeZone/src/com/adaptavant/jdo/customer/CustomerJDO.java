@@ -27,6 +27,9 @@ public class CustomerJDO {
 	
 	@Persistent
 	private Date lastLogin;
+	
+	@Persistent
+	private boolean forgot=false;
 
 
 	/**
@@ -106,5 +109,21 @@ public class CustomerJDO {
 	 */
 	public void setLastLogin(Date lastLogin) {
 		this.lastLogin = lastLogin;
+	}
+
+
+	/**
+	 * @return the forgot
+	 */
+	public boolean isForgot() {
+		return forgot;
+	}
+
+
+	/**
+	 * @param forgot the forgot to set
+	 */
+	public void setForgot(boolean forgot) {
+		this.forgot = forgot;
 	}
 }

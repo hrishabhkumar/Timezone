@@ -5,9 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <%if(session.getAttribute("key")==null){
-		response.sendRedirect("/login.html");
-	}%> 
+ 
 <title>Timezone</title>
 	<!--- CSS --->
 	<script src="jsfile/jquery-1.9.1.js"></script>
@@ -24,6 +22,15 @@
      </script>
 </head>
 <body>
+	<%
+	 response.setHeader("Cache-Control", "no-cache");
+	 response.setHeader("Cache-Control", "no-store");
+	 response.setDateHeader("Expires", 0);
+	 response.setHeader("Pragma", "no-cache");
+	 if (session.getAttribute("key") == null ) {
+	  response.sendRedirect("/login");
+	 }
+	%>
 	<jsp:include page="header.jsp"></jsp:include>
 		<div class="container" >
 			<h1>Please Select Country, State and City to get time of particular place.</h1>

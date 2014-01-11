@@ -12,6 +12,7 @@
 			    	<%if(session.getAttribute("key")==null){ %><li id="login"><a href="/login.html" >Login</a></li><%} %>
 			    	<%if(session.getAttribute("key")==null){ %><li id=register><a href="/register.html" >Register</a></li><%} %>
 				   <%if(session.getAttribute("key")!=null){ %> <li id=timezone><a href="/timezone.html">Timezone</a></li><%} %>
+				   <%if(session.getAttribute("key")!=null){ %> <li id=conveter><a href="/converter.html">Timezone Converter</a></li><%} %>
 				   <%if(session.getAttribute("key")!=null){ %> <li id=logout><a href="/logout.html">Logout</a></li><%} %>
 			    </ul>
 	    

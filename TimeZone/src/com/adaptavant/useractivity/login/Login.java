@@ -19,10 +19,15 @@ import com.google.appengine.api.datastore.KeyFactory;
  */
 public class Login {
 	
-	
+	/**
+	 * 
+	 * @param session
+	 * @param email
+	 * @param password
+	 * @return userKey
+	 * this method is used for user login and create their session.
+	 */
 	public String login(HttpSession session, String email, String password){	
-		
-		
 		if(session.getAttribute("key")==null){
 			System.out.println("new Seesion");
 			if(email==""||password==""||email==null||password==null){

@@ -26,12 +26,13 @@ import com.google.appengine.datanucleus.query.JDOCursorHelper;
 public class DataListProvider {
 	Logger logger=Logger.getLogger("DataListProvider");
 	JSONArray array=new JSONArray();
-	
-/*
- * This method will get country list from database and store it in memcache. 
- * 
- * It will be called only if it is not available in memcache.
- */
+	/**
+	 * 
+	 * @param limit
+	 * @param cursorString
+	 * This method will get country list from database and store it in memcache.
+	 * It will be called only if it is not available in memcache.
+	 */
 	public void getCountryList(int limit,String cursorString){
 		String keyString="CountryList";
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
@@ -76,12 +77,15 @@ public class DataListProvider {
 			  query.closeAll();
 			}
 		}
-	/*
-	 * This method will return JSON Array of State and also store it in memcache after taking Country name from user.
+	/**
 	 * 
+	 * @param country
+	 * @param limit
+	 * @param cursorString
+	 * @return JSONArray of state list
+	 * This method will return JSON Array of State and also store it in memcache after taking Country name from user.
 	 * It will be called only if state list is not available in memcache.
 	 */
-	
 	public JSONArray getStateList(String country, int limit, String cursorString){
 		String keyString="getStateList1"+country;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	
@@ -128,13 +132,14 @@ public class DataListProvider {
 		}
 		return array;		
 	}
-	
-	/*
-	 * This method will return JSON Array of city list after taking Country name and State name from user.
+	/**
 	 * 
+	 * @param country
+	 * @param state
+	 * @return JSONArray of city list
+	 *  This method will return JSON Array of city list after taking Country name and State name from user.
 	 * It will be called only if city list is not available in memcache.
 	 */
-
 	public JSONArray getCityList(String country, String state){
 		String keyString="getCityList"+country+"and"+state;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();	

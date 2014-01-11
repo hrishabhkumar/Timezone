@@ -21,7 +21,12 @@ import com.adaptavant.timezone.services.MCacheService;
  */
 public class DeleteData {
 	Logger logger=Logger.getLogger(DeleteData.class.getName());
-	
+	/**
+	 * 
+	 * @param TimeZoneData
+	 * @return status
+	 * this method will be used to delete timezone data
+	 */
 	public String deleteData(JSONObject TimeZoneData){
 		String country=TimeZoneData.get("country").toString();
 		String state=TimeZoneData.get("state").toString();
