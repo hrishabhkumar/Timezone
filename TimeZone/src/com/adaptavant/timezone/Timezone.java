@@ -4,6 +4,7 @@
 package com.adaptavant.timezone;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -35,10 +36,11 @@ public class Timezone {
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject getTimezoneData(String key, String city, String state, String country, String countryCode, String zipCode, String latitude, String longitude){
+		String distance=null;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();
 		System.out.println(key);
 		CustomerJDO customer= pm.getObjectById(CustomerJDO.class, key);
-		String keyString="getTimeZoneDataOf"+city+state+country+countryCode+latitude+longitude+zipCode;
+		String keyString="getTimeZoneDataOf"+"city="+city+"state="+state+"country="+country+"countrycode="+countryCode+"latitude="+latitude+"longitude="+longitude+"zipcode="+zipCode;
 		if(MCacheService.get(keyString)!=null){
 			int requests=customer.getRequests();
 			requests++;
@@ -54,34 +56,48 @@ public class Timezone {
 				query.setRange(0,1);
 				System.out.println(query.toString());
 			}
+			//Query for city,state and Country.
 			else if(city==null&&state!=null&&country!=null){
 				query = pm.newQuery(TimezoneJDO.class,
 		                	"state == '" +state+"' && country == '"+country+"'");
 				query.setRange(0,1);
 				System.out.println(query.toString());
 			}
+			//Query for city and state
 			else if(city!=null&&state!=null){
 				query = pm.newQuery(TimezoneJDO.class,
 	                	"state == '" +state+"' && city == '"+city+"'");
 				query.setRange(0,1);
 				System.out.println(query.toString());
 			}
+			//Query for state and Country code
 			else if(state!=null&&countryCode!=null){
 				query = pm.newQuery(TimezoneJDO.class,
 	                	"state == '" +state+"' && countryCode == '"+countryCode+"'");
 				query.setRange(0,1);
 				System.out.println(query.toString());
 			}
+			//Query for Zip code
 			else if(zipCode!=null){
 				query = pm.newQuery(TimezoneJDO.class,
 	                	"zipCode == '" +zipCode+"'");
 				query.setRange(0,1);
 				System.out.println(query.toString());
 			}
+			//Query for longitude and latitude.
 			else if(longitude!=null&&latitude!=null){
-				query = pm.newQuery(TimezoneJDO.class,
-	                	"longitude == '" +longitude+"' && latitude == '"+latitude+"'");
-				query.setRange(0,1);
+				double latpoint=Double.parseDouble(latitude);
+				double longpoint=Double.parseDouble(longitude);
+				LongLatDataProvider longLatDataProvide=new LongLatDataProvider();
+				Map<String, String> vistorZip=longLatDataProvide.getNearestZip(latpoint, longpoint);
+				if(vistorZip!=null){
+					distance=vistorZip.get("distance")+"K.M";
+					String zip=vistorZip.get("zip");
+					query = pm.newQuery(TimezoneJDO.class,
+		                	"zipCode == '" +zip+"'");
+					query.setRange(0,1);
+					
+				}
 				System.out.println(query.toString());
 			}
 			
@@ -110,6 +126,9 @@ public class Timezone {
 				  }
 				  JSONObject object=new JSONObject();
 				  object.put("data",array);
+				  if(longitude!=null&&latitude!=null){
+					  object.put("distance", distance);
+				  }
 				  object.put("status", "success");
 				  int requests=customer.getRequests();
 					requests++;

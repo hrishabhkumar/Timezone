@@ -1,6 +1,6 @@
 $(document).ready(function(){
-	var timezonelist;
-	function getTimezonenames(){
+	$(function() {
+		var datalist;
 		var dataString={
 				required: "timezonenames"
 				};
@@ -16,18 +16,98 @@ $(document).ready(function(){
 			cache: false,
 			processData:false,
 			success: function(data){
-				alert(data.list)
-				timezonelist=data.list;
+				datalist=data.list;
 		      },
 		    error: function(data){
 		    }
 		});
-	}
-	
-	$(function() {
-	    alert( getTimezonenames());
-	    $( "input:text" ).autocomplete({
-	      source: timezonelist
-	    });
+		$( "#timezone1" ).autocomplete({
+			minLength: 0,
+			source:datalist,
+			focus: function( event, ui ) {
+				$( "#timezone1" ).val( ui.item.label );
+				return false;
+			},
+			select: function( event, ui ) {
+				$( "#timezone1" ).val( ui.item.label );
+				$( "#timezone1-offset" ).val( ui.item.value);
+				return false;
+			},
+			change: function( event, ui ) {
+				$( "#timezone1" ).val( ui.item.label );
+				$( "#timezone1-offset" ).val( ui.item.value);
+				return false;
+			}
+	    })
+	    .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+	      return $( "<li>" )
+	        .append( "<a>" + item.label + "<br>" + item.desc + "</a>" )
+	        .appendTo( ul );
+	    };
+	    $( "#timezone2" ).autocomplete({
+			minLength: 0,
+			source:datalist,
+			focus: function( event, ui ) {
+				$( "#timezone2" ).val( ui.item.label );
+				return false;
+			},
+			select: function( event, ui ) {
+				$( "#timezone2" ).val( ui.item.label );
+				$( "#timezone2-offset" ).val( ui.item.value );
+				return false;
+			}
+	    })
+	    .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+	      return $( "<li>" )
+	        .append( "<a>" + item.label + "<br>" + item.desc + "</a>" )
+	        .appendTo( ul );
+	    };
 	  });
+	
+		function converter(src, dest){
+		var hour=$('#time'+src).val().split(':')[0];
+		var min=$('#time'+src).val().split(':')[1];
+		var raw_offset_origin=$( "#timezone"+src+"-offset" ).val();
+		var raw_offset_dest=$( "#timezone"+dest+"-offset" ).val();
+		var total_offset=parseInt(raw_offset_dest)-(parseInt(raw_offset_origin));
+		var input_miliseconds=(parseInt(hour)*60*60*1000)+(parseInt(min)*60*1000);
+		var date=new Date();
+		var localOffset = date.getTimezoneOffset()*60000;
+		var date=new Date(input_miliseconds+localOffset+total_offset);
+		hour=date.getHours();
+		min=date.getMinutes();
+		if(min<10){
+			min="0"+min
+		}
+		if(hour<10){
+			hour="0"+hour
+		}
+		$('#time'+dest).val(hour+":"+min+":00");
+//		if(hour==0){
+//			hour=12;
+//			$('#time'+dest).val(hour+":"+min+" AM");
+//		}
+//		else if(hour<12){
+//			$('#time'+dest).val(hour+":"+min+" AM");
+//		}
+//		else if(hour==12){
+//			$('#time'+dest).val(hour+":"+min+" PM");
+//		}
+//		else{
+//			hour-=12;
+//			$('#time'+dest).val(hour+":"+min+" PM");
+//		}
+		}
+		$('#time1').change(function(){
+			converter(1,2)
+		});
+		$('#time2').change(function(){
+			converter(2,1)
+		});
+		$('#timezone1').on('click', function(e){
+			converter(1,2);
+		});
+		$('#timezone2').on('click', function(e){
+			converter(2,1);
+		});
 });

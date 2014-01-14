@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.adaptavant.converter.TimezoneListProvider;
+import com.adaptavant.timezone.LongLatDataProvider;
 import com.adaptavant.timezone.Timezone;
 import com.adaptavant.timezone.services.MCacheService;
 import com.adaptavant.timezone.services.uploaddata.UploadData;
@@ -116,20 +117,21 @@ public class TimezoneController {
 	 * @param resp
 	 * @return timezone data
 	 * this is rest client URL will used to find time zone data using only longitude and latitude
+	 * @throws ParseException 
 	 */
 	@RequestMapping(value="/timezone",params={"longitude", "latitude"}, method=RequestMethod.GET)
-	public @ResponseBody String longitudeLatitude(HttpServletRequest req, HttpServletResponse resp){
+	public @ResponseBody String longitudeLatitude(HttpServletRequest req, HttpServletResponse resp) throws ParseException{
 		String key=(String) req.getSession().getAttribute("key");
 		if(key!=null){
-		String longitude=WordUtils.capitalizeFully(req.getParameter("longitude"));
-		String latitude=WordUtils.capitalizeFully(req.getParameter("latitude"));
-		JSONObject obj=new JSONObject();
-		obj.put("latitude", latitude);
-		obj.put("longitude", longitude);
-		JSONObject obj1=new JSONObject();
-		obj1.put("place", obj);
-		obj1.put("key", key);
-		return timezoneAction(req, obj1.toJSONString());
+			String latitude=req.getParameter("latitude");
+			String longitude=req.getParameter("longitude");
+			JSONObject obj=new JSONObject();
+			obj.put("longitude", longitude);
+			obj.put("latitude", latitude);
+			JSONObject obj1=new JSONObject();
+			obj1.put("place", obj);
+			obj1.put("key", key);
+			return timezoneAction(req, obj1.toJSONString());
 		}
 		else{
 			return "please login..";
@@ -373,6 +375,7 @@ public class TimezoneController {
 	@RequestMapping("/list")
 	public void getlist(HttpServletRequest req, HttpServletResponse resp){
 		DataListProvider dlp=new DataListProvider();
+		
 		int limit=Integer.parseInt(req.getParameter("limit"));
 		String cursorString=req.getParameter("cursorString");
 		if(req.getParameter("list").equals("country")){
@@ -385,6 +388,11 @@ public class TimezoneController {
 			TimezoneListProvider listprovider=new TimezoneListProvider();
 			listprovider.getTimezoneIDList(limit, cursorString);
 		}
+		else if(req.getParameter("list").equals("longAndLat")){
+			LongLatDataProvider longLatDataProvider=new LongLatDataProvider();
+			longLatDataProvider.getlongitudeList(limit, cursorString);
+		}
+		
 	}
 	
 	@RequestMapping(value="/converter",method=RequestMethod.GET )
@@ -398,7 +406,8 @@ public class TimezoneController {
 			JSONObject requirment=(JSONObject) parser.parse(reqired);
 			if(requirment.get("required").toString().equals("timezonenames")){
 				TimezoneListProvider timezoneListProvider=new TimezoneListProvider();
-				return timezoneListProvider.getTimezoneIDList(1000, null);
+				JSONObject obj= timezoneListProvider.getTimezoneIDList(1000, null);
+				return obj.toJSONString();				
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();

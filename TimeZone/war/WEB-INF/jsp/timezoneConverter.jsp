@@ -6,12 +6,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+<link href="css/bootstrap.min.css" rel="stylesheet">
 <script src="jsfile/jquery-1.9.1.js"></script>
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-     <script src="js/bootstrap.min.js"></script>
-     <script src="jsfile/converter.js"></script>
-     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-	<script type="text/javascript">
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="jsfile/converter.js"></script>
+<script type="text/javascript">
 	$(document).ready(function(){
 	     if (!$('#conveter').hasClass('active')) {
 	 		$('#conveter').addClass('active');
@@ -50,11 +50,13 @@
 	    			 	<div class="col-sm-3">
 	    			 		<label for="timezone1">Timezone:</label>
 		    				<input type="text" placeholder="Timezone" class="form-control" name="timezone1" id="timezone1">
+		    				<input type="hidden" id="timezone1-offset">
 		    				<span id="timezone1Span" class="help-block"></span>
 		    				</div>
 		    				<div class="col-sm-3">
 	    			 		<label for="timezone2">Timezone:</label>
 		    					<input type="text" placeholder="Timezone" class="form-control" name="timezone2" id="timezone2">
+		    					<input type="hidden" id="timezone2-offset">
 		    					<span id="useridSpan" class="help-block"></span>
 		    				</div>
 		    			</div> 
