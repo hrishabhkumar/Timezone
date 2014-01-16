@@ -198,6 +198,13 @@ $(document).ready(function(){
 		if (!$('#timezone').hasClass('active')) {
      		$('#timezone').addClass('active');
      	}
+		$('#myTab a').click(function (e) {
+			  e.preventDefault()
+			  $(this).tab('show');
+			});
+		$('#phoneNumber').change(function(){
+			alert($('#phoneNumber').val());
+		});
         
 });
 	

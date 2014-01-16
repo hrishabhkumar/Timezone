@@ -10,17 +10,21 @@
 <%if(session.getAttribute("key")==null){
 		response.sendRedirect("/login.html");
 	}%> 
-	<script src="jsfile/jquery-1.9.1.js"></script>
-	
 	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<script src="jsfile/jquery-1.9.1.js"></script>
      <script src="js/bootstrap.min.js"></script>
+     <script src="jsfile/home.js"></script>
      <script type="text/javascript">
-$(document).ready(function(){
-    if (!$('#home').hasClass('active')) {
-		$('#home').addClass('active');
-	}
-    });
-</script>
+     function getClock(rawOffset, id)
+ 	{
+ 		var date=new Date();
+ 		var localOffset = date.getTimezoneOffset()*60000;
+ 		date=new Date(date.getTime()+rawOffset);
+ 		$(id).empty();
+ 		$(id).html(date.toUTCString());
+ 	    setTimeout('getClock('+rawOffset+',"'+ id+'")','1000');
+ 	}
+     </script>
 </head>
 <body>
 	<%
@@ -59,6 +63,30 @@ $(document).ready(function(){
 			     		</div>
 			     	</div>
 				<%} %>
+				<div class="form-group">
+			    	<label class="col-sm-3 control-label">Your Current City :</label>
+					<div class="col-sm-9">
+			     		<p class="form-control-static" id=city></p>
+			     	</div>
+			    </div>
+			    <div class="form-group">
+			    	<label class="col-sm-3 control-label">Your Current State :</label>
+					<div class="col-sm-9">
+			     		<p class="form-control-static" id=state></p>
+			     	</div>
+			    </div>
+			    <div class="form-group">
+			    	<label class="col-sm-3 control-label">Your Current Country :</label>
+					<div class="col-sm-9">
+			     		<p class="form-control-static" id=country></p>
+			     </div>
+			     </div>
+			     <div class="form-group">
+			    	<label class="col-sm-3 control-label">Your Current Time :</label>
+					<div class="col-sm-9">
+			     		<p class="form-control-static" id=time></p>
+			     </div>
+			    </div>
 			</div>
 		</div>
 	</div>

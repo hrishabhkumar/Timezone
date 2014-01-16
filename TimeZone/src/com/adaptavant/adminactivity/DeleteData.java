@@ -12,8 +12,8 @@ import javax.jdo.Query;
 import org.json.simple.JSONObject;
 
 import com.adaptavant.jdo.PMF;
-import com.adaptavant.jdo.timezone.TimezoneJDO;
-import com.adaptavant.timezone.services.MCacheService;
+import com.adaptavant.jdo.TimezoneJDO;
+import com.adaptavant.utilities.MCacheService;
 
 /**
  * @author Hrishabh.Kumar
@@ -22,7 +22,6 @@ import com.adaptavant.timezone.services.MCacheService;
 public class DeleteData {
 	Logger logger=Logger.getLogger(DeleteData.class.getName());
 	/**
-	 * 
 	 * @param TimeZoneData
 	 * @return status
 	 * this method will be used to delete timezone data

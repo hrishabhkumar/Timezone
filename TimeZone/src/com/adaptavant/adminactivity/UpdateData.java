@@ -12,9 +12,9 @@ import javax.jdo.Query;
 import org.json.simple.JSONObject;
 
 import com.adaptavant.jdo.PMF;
-import com.adaptavant.jdo.timezone.TimezoneJDO;
-import com.adaptavant.timezone.services.MCacheService;
-import com.adaptavant.useractivity.list.DataListProvider;
+import com.adaptavant.jdo.TimezoneJDO;
+import com.adaptavant.timezone.services.DataListProvider;
+import com.adaptavant.utilities.MCacheService;
 
 /**
  * @author Hrishabh.Kumar

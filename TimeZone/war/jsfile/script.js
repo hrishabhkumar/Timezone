@@ -117,5 +117,6 @@ $(document).ready(function(){
 				$('#registerFailed').fadeOut(5000);
 			}
 		});
+		$('#userid').focus();
 		
 });
