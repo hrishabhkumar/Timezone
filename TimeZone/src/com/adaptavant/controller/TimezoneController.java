@@ -2,13 +2,9 @@ package com.adaptavant.controller;
 
 import java.util.Calendar;
 import java.util.logging.Level;
-
-
 import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.text.WordUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -19,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.adaptavant.timezone.converter.TimezoneListProvider;
 import com.adaptavant.timezone.services.DataListProvider;
 import com.adaptavant.timezone.services.LongLatDataProvider;
+import com.adaptavant.timezone.services.SearchByCity;
 import com.adaptavant.timezone.services.Timezone;
 import com.adaptavant.timezone.services.uploaddata.UploadData;
 import com.adaptavant.utilities.MCacheService;
@@ -462,9 +458,16 @@ public class TimezoneController
 			longLatDataProvider=new LongLatDataProvider();
 			longLatDataProvider.getlongitudeList(limit, cursorString);
 		}
+		else if(req.getParameter("list").equals("cityData")){
+			SearchByCity searchByCity=new SearchByCity();
+			searchByCity.getCityJson(limit, cursorString, req.getParameter("keyString"));
+		}
 		
 	}
-	
+	/**
+	 * 
+	 * @return
+	 */
 	@RequestMapping(value="/converter",method=RequestMethod.GET )
 	public String converterURL()
 	{
@@ -504,5 +507,71 @@ public class TimezoneController
 		}
 		
 	}
-	
+	/**
+	 * 
+	 * @return current server time.
+	 */
+	@RequestMapping(value="/getUTCTime")
+	public @ResponseBody String getUTCTime()
+	{
+		Calendar cal=Calendar.getInstance();
+		System.out.println(((Long)cal.getTimeInMillis()).toString());
+		return ((Long)cal.getTimeInMillis()).toString();
+	}
+	/**
+	 * 
+	 * @param searchData
+	 * @return
+	 */
+	@RequestMapping(value="/timezonebycity" ,method=RequestMethod.POST)
+	public @ResponseBody String getTimezoneByCity(@RequestBody String searchData)
+	{
+		JSONArray responseArray=new JSONArray();
+		try 
+		{
+			JSONObject termJSon=(JSONObject) jsonParser.parse(searchData);
+			if(MCacheService.containsKey("getCityData1"))
+			{
+				logger.info("inside memcache of getTimezoneByCity");
+				JSONArray memcacheData=new JSONArray();
+				for(int i=1;i<=10;i++)
+				{
+					if(MCacheService.containsKey("getCityData"+i))
+					{
+						memcacheData.addAll((JSONArray)MCacheService.get("getCityData"+i));
+					}
+					else
+					{
+						break;
+					}
+				}
+				logger.info(termJSon.get("term").toString());
+				for(Object cityData: memcacheData)
+				{
+					JSONObject data=(JSONObject) cityData;
+					if(data.get("label").toString().toLowerCase().contains(termJSon.get("term").toString().toLowerCase()))
+					{
+						responseArray.add(data);
+					}
+					else
+					{
+						continue;
+					}
+				}
+				return responseArray.toJSONString();
+			}
+			else
+			{
+				logger.info("inside else of getTimezoneByCity data not available in membache");
+				SearchByCity searchByCity=new SearchByCity();
+				String cityData=searchByCity.getCityJson(1000, null, "getCityData1").toJSONString();
+				return cityData;
+			}
+		} 
+		catch (ParseException e) 
+		{
+			e.printStackTrace();
+			return responseArray.toJSONString();
+		}
+	}
 }

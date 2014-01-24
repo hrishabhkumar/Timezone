@@ -18,7 +18,6 @@
      function getClock(rawOffset, id)
  	{
  		var date=new Date();
- 		var localOffset = date.getTimezoneOffset()*60000;
  		date=new Date(date.getTime()+rawOffset);
  		$(id).empty();
  		$(id).html(date.toUTCString());

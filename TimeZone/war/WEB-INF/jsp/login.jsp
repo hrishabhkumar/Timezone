@@ -25,17 +25,17 @@
 </head>
 <body>
 	<jsp:include page="header.jsp"></jsp:include>
-	<div class="container col-sm-offset-4">
+	<div class="container">
+	<div class="col-sm-offset-4">
 		<div class="header">
 				<span style="color: red">${recoverfail}</span>
 				<span style="color: green">${recovermsg}</span>
 			
     			<h1>Sign In</h1>
     			</div>
-    			<div class="container">
     				If you are already registered please enter:
     				
-	    			<form action="#" class="form-horizontal" role=form id="loginForm">
+	    			<form action="#" class="form-horizontal " role=form id="loginForm">
 	    			 	<span id="loginFailed" style="color: red"></span>
 	    			 	<div class="form-group">
 	    			 	<div class="col-sm-4">

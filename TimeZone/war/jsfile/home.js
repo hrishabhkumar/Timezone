@@ -22,8 +22,13 @@ $(document).ready(function(){
 			timezonedata=timezonedata.data
 			$('#city').html(timezonedata[0].city+" ("+distance+")");
 			$('#state').html(timezonedata[0].state);
-			$('#country').html(timezonedata[0].country+'<script type="text/javascript">window.onload = getClock('+timezonedata[0].rawOffset+',"#time" );</script>');
-			
+			$.get( "/getUTCTime", function(time){
+				var localTime=new Date();
+	 			serverTime=time;
+	 			var rawOffset=serverTime-localTime.getTime()+timezonedata[0].rawOffset;
+	 			$('#country').html(timezonedata[0].country+'<script type="text/javascript">window.onload = getClock('+rawOffset+',"#time" );</script>');
+			});
+	 		
 		});
 	}
 	

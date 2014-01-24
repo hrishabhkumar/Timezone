@@ -17,6 +17,7 @@ $(document).ready(function(){
 			processData:false,
 			success: function(data){
 				datalist=data.list;
+				console.log(data)
 		      },
 		    error: function(data){
 		    }
