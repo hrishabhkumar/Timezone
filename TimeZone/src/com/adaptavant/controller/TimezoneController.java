@@ -307,7 +307,7 @@ public class TimezoneController
 	public void uploadTime(HttpServletRequest req, HttpServletResponse resp)
 	{
 		UploadData uploadData=new UploadData();
-		uploadData.uploadTime(null);
+		uploadData.uploadTime();
 	}
 	/**
 	 * 
@@ -402,7 +402,6 @@ public class TimezoneController
 					responseJson=(JSONObject) jsonParser.parse(timezoneAction(req,listRequiredJson.toJSONString()));
 					Calendar cal=Calendar.getInstance();
 					responseJson.put("currentTime", cal.getTimeInMillis());
-					responseJson.put("status", "success");
 					return responseJson.toJSONString();
 				}
 				catch(Exception e){
@@ -466,7 +465,7 @@ public class TimezoneController
 	}
 	/**
 	 * 
-	 * @return
+	 * @return data for converter.
 	 */
 	@RequestMapping(value="/converter",method=RequestMethod.GET )
 	public String converterURL()
@@ -573,5 +572,21 @@ public class TimezoneController
 			e.printStackTrace();
 			return responseArray.toJSONString();
 		}
+	}
+	
+	@RequestMapping(value="/dailyMemcacheClearance")
+	public void dailyMemcacheClearance(){
+		MCacheService.removeAll();
+		DataListProvider dataListProvider=new DataListProvider();;
+		TimezoneListProvider listprovider=new TimezoneListProvider();
+		LongLatDataProvider longLatDataProvider=new LongLatDataProvider();
+		SearchByCity searchByCity=new SearchByCity();
+		int limit=1000;
+		String cursorString=null;
+		
+		dataListProvider.getCountryList(limit, cursorString);
+		listprovider.getTimezoneConvertorData(limit, cursorString);
+		longLatDataProvider.getlongitudeList(limit, cursorString);
+		searchByCity.getCityJson(limit, cursorString, "getCityData1");
 	}
 }

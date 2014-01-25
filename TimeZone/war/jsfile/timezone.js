@@ -48,6 +48,8 @@ $(document).ready(function(){
 					var time=data.currentTime;
 					timezonedata=data.data;
 					var totalrawOffset;
+					$('#resultHeader').empty();
+					$('#result').removeAttr('style');
 					$('#resultHeader').html("<h1>Your timeZone Data:</h1>");
 					var output='<div class="form-horizontal">';
 					for (var i in timezonedata) {
@@ -211,6 +213,7 @@ $(document).ready(function(){
 			$('#cityName').autocomplete({
 				minLength: 3,
 				source: function (request, response) {
+					zip=null;
 		            var dataString={
 		            	term: $.ui.autocomplete.escapeRegex(request.term)
 		            };
@@ -259,6 +262,7 @@ $(document).ready(function(){
 		//Search using City name.
 		$('#cityName').on( "autocompleteselect", function( event, ui ) {
 			$('#searchByCity').attr('disabled', true);
+			$('#cityNameSpan').empty();
 			var place={
 					zipCode: zip
 					};
@@ -276,7 +280,9 @@ $(document).ready(function(){
 		});
 		$('#cityName').on( "autocompletechange", function( event, ui ) {
 			$('#searchByCity').attr('disabled', true);
-			if(zip!=null&&zip!=''){
+			if(zip!=null&&zip!='')
+			{
+				$('#cityNameSpan').empty();
 				var place={
 						zipCode: zip
 						};
@@ -298,6 +304,7 @@ $(document).ready(function(){
 			$('#searchByCity').attr('disabled', true);
 			if(zip!=null&&zip!='')
 			{
+				$('#cityNameSpan').empty();
 				var place={
 						zipCode: zip
 						};

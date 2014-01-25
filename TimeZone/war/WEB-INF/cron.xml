@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+  
+  <cron>
+    <url>/dailyMemcacheClearance</url>
+    <description>Clear memecache daily</description>
+    <schedule>every day 00:00</schedule>
+    <timezone>Asia/Kolkata</timezone>
+  </cron>
+  
+</cronentries>

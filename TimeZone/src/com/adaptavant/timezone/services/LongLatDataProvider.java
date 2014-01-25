@@ -130,7 +130,7 @@ public class LongLatDataProvider
   			String langString=longAndLatMap.get(zipCode);
   			double latitude=Double.parseDouble(langString.substring(0, langString.indexOf('s')));
   			double longitude=Double.parseDouble(langString.substring(langString.indexOf('s')+1, langString.length()));
-//  		if((latitude>=(latpoint-50/111.045)&&latitude<=(latpoint+50/111.045))&&(longitude>=(longpoint - (50.0 / (111.045 * Math.cos(Math.toRadians(latpoint)))))&&longitude<=(longpoint + (50.0 / (111.045 * Math.cos(Math.toRadians(latpoint))))))){
+  		if((latitude>=(latpoint-50/111.045)&&latitude<=(latpoint+50/111.045))&&(longitude>=(longpoint - (50.0 / (111.045 * Math.cos(Math.toRadians(latpoint)))))&&longitude<=(longpoint + (50.0 / (111.045 * Math.cos(Math.toRadians(latpoint))))))){
 	  		double distance=Math.round(6378.10 * Math.acos(Math.cos(Math.toRadians(latpoint)) 
 		                 * Math.cos(Math.toRadians(latitude)) 
 		                 * Math.cos(Math.toRadians(longpoint) - Math.toRadians(longitude)) 
@@ -139,7 +139,7 @@ public class LongLatDataProvider
 	  		
 	  		distanceWithZip.put(distance, zipCode);
 	  		
-//  		}
+  		}
   		}
   		logger.info("size of result"+distanceWithZip.size());
   		

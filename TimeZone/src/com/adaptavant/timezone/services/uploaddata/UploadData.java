@@ -1,7 +1,6 @@
 package com.adaptavant.timezone.services.uploaddata;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,23 +13,25 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.TimezoneJDO;
+import com.adaptavant.timezone.converter.TimezoneListProvider;
 import com.adaptavant.timezone.services.DataListProvider;
+import com.adaptavant.timezone.services.LongLatDataProvider;
+import com.adaptavant.timezone.services.SearchByCity;
 import com.adaptavant.utilities.MCacheService;
 
 public class UploadData {
 	Logger logger=Logger.getLogger(UploadData.class.getName());
-	public void uploadTime(File file)
+	public void uploadTime()
 	{
 		StringTokenizer token = null;
 		BufferedReader br = null;
 		String line=null;
-		DataListProvider dataListProvider=null;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();
 		TimezoneJDO timezoneJDO=null;;
 		Collection<TimezoneJDO> timezoneDataList=new ArrayList<TimezoneJDO>();
 		try
 		{
-			br=new BufferedReader(new FileReader(file));
+			br=new BufferedReader(new FileReader("db.csv"));
 			while((line=br.readLine())!=null)
 			{	
 				System.out.println(line);
@@ -94,8 +95,17 @@ public class UploadData {
 			pm.makePersistentAll(timezoneDataList);
 			pm.close();
 			MCacheService.removeAll();
-			dataListProvider=new DataListProvider();
-			dataListProvider.getCountryList(1000, null);
+			DataListProvider dataListProvider=new DataListProvider();;
+			TimezoneListProvider listprovider=new TimezoneListProvider();
+			LongLatDataProvider longLatDataProvider=new LongLatDataProvider();
+			SearchByCity searchByCity=new SearchByCity();
+			int limit=1000;
+			String cursorString=null;
+			
+			dataListProvider.getCountryList(limit, cursorString);
+			listprovider.getTimezoneConvertorData(limit, cursorString);
+			longLatDataProvider.getlongitudeList(limit, cursorString);
+			searchByCity.getCityJson(limit, cursorString, "getCityData1");
 		}
 		catch (Exception e) 
 		{
