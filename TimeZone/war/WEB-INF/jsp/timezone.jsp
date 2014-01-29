@@ -8,11 +8,12 @@
  
 <title>Timezone</title>
 	<!--- CSS --->
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	 <link rel="stylesheet" href="css/jquery-ui.css">
+	 <link rel="stylesheet" href="css/bootstrap-formhelpers.css">
 	<link href="css/bootstrap.min.css" rel="stylesheet">
 	<script src="jsfile/jquery-1.9.1.js"></script>
      <script src="js/bootstrap.min.js"></script>
-     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+     <script src="js/jquery-ui.js"></script>
      <script src="jsfile/timezone.js"></script>
      <script src="jsfile/bootstrap-formhelpers-phone.js"></script>
       <style>
@@ -31,6 +32,9 @@
         .ui-autocomplete-loading {
     		background: white url('img/loader.gif') right center no-repeat;
   		 }
+  		 .ui-helper-hidden {
+		display: block;
+		}
      </style>
      <script type="text/javascript">
      function date_time(id, offset)
@@ -50,18 +54,69 @@
 	 response.setHeader("Cache-Control", "no-store");
 	 response.setDateHeader("Expires", 0);
 	 response.setHeader("Pragma", "no-cache");
-	 if (session.getAttribute("key") == null ) {
-	  response.sendRedirect("/login");
+	 if (session.getAttribute("key") == null ) 
+	 {
+		response.sendRedirect("/login");
 	 }
 	%>
+	
 	<jsp:include page="header.jsp"></jsp:include>
 		<div class="container" >
 		<ul class="nav nav-tabs" id="myTab">
- 			<li id='searchByCityTab'class="active"><a href="#searchByCity" data-toggle="tab">Search by City</a></li>
+ 			<li class="active"><a href="#searchByCity" data-toggle="tab">Search by City</a></li>
+ 			<li id='searchByZipTab'><a href="#searchByZip" data-toggle="tab">Search by Zip Code</a></li>
   			<li><a href="#searchByPhone" data-toggle="tab">Search by Phone Number</a></li>
-  			<li><a href="#searchByPlace" data-toggle="tab">Search by Place</a></li>
+  			<li id="searchByPlaceTab"><a href="#searchByPlace" data-toggle="tab">Search by Place</a></li>
 		</ul>
 		<div class='tab-content'>
+			<div id='searchByCity' class='tab-pane active'>
+				<h1>Please enter city to get time of particular place.</h1>
+				<form id=serachByCity class=form>
+					<div class='row'>
+						<div class='col-sm-4'>
+							<label for='cityName '>City:</label>
+		  						<input class="form-control" id='cityName' placeholder='City' >
+							<span id='cityNameSpan ' class='help-block'></span>
+						</div>
+					</div>
+					<div class='row'>
+						<div class=col-sm-4>
+							<button type='submit' class='btn btn-success form-control' id='searchByCity'>Search</button>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div id='searchByZip' class='tab-pane'>
+				<h1>Please enter Zipcode along with country name to get time of particular place.</h1>
+				<form id=serachByZip class=form>
+					<div class='row'>
+						<div class=col-sm-4>
+							<label for='countryName'>Country:</label>
+							<input id='countryName' class=form-control> 
+							<span id='countryNameSpan' class='help-block'></span>
+						</div>
+					</div>
+					<div class='row'>
+						<div class=col-sm-4>
+							<label for='countryCode'>Country Code:</label>
+							<input id='countryCode' class=form-control readonly> 
+						</div>
+					</div>
+					<div class='row' id='zipDiv'>
+						<div class='col-sm-4'>
+							<label for='zip '>Zip:</label>
+		  						<input class="form-control" id='zip' placeholder='Zip' >
+							<span id="zipSpan" class='help-block'></span>
+						</div>
+					</div>
+					<div id='zipResult'></div>
+					<div class='row'>
+						<div class=col-sm-4>
+							<button type='submit' class='btn btn-success form-control' id='searchByCity'>Search</button>
+						</div>
+					</div>
+				</form>
+			</div>
 			<div id='searchByPlace' class='tab-pane'>
 				<h1>Please Select Country, State and City to get time of particular place.</h1>
 				<form class='form' id='searchForm'>
@@ -72,7 +127,6 @@
 							<span id='countrySpan' class='help-block'></span>
 						</div>
 					</div>
-					<span></span>
 					<div class='row'>
 						<div class=col-sm-4>
 							<label for='state'>State:</label>
@@ -83,7 +137,7 @@
 				
 					<div class='row'>
 						<div class=col-sm-4>
-						<label for='state'>City:</label>
+						<label for='state'>City:</label><br>
 						<select id=city class=form-control></select>
 						<span id='citySpan' class='help-block'></span>
 						</div>
@@ -117,29 +171,12 @@
 			</div>
 		</form>
 	</div>
-	<div id='searchByCity' class='tab-pane active'>
-	<h1>Please enter city to get time of particular place.</h1>
-		<form id=serachByCity class=form>
-			<div class='row'>
-				<div class='col-sm-4'>
-					<label for='cityName'>City:</label>
-  						<input class="form-control" id='cityName' placeholder='City' >
-					<span id='cityNameSpan' class='help-block'></span>
-				</div>
-			</div>
-			<div class='row'>
-				<div class=col-sm-4>
-					<button type='submit' class='btn btn-success form-control' id='searchByCity'>Search</button>
-				</div>
-			</div>
-		</form>
-	</div>
 	</div>
 	</div>
 	<br>
 	<div class="container">
 	    <div class="row">
-	    	<div class="col-lg-9">
+	    	<div class="col-lg-12">
 	    		<div class="panel  panel-default">
 	    			<div class="panel-body">
 	    			<div class="page-header" id=resultHeader>
@@ -151,6 +188,7 @@
 	    			</div>
 	    		</div>
 	    	</div>
+	    	
 	    </div>
     </div>
 		

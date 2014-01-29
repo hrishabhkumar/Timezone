@@ -7,6 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
 <link href="css/bootstrap.min.css" rel="stylesheet">
+<script src="jsfile/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="jsfile/converter.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+	     if (!$('#conveter').hasClass('active')) 
+	     {
+	    	 $('#conveter').addClass('active');
+	     }
+	});
+	</script>
+	
 <style>
        .ui-autocomplete {
             max-height: 200px;
@@ -17,17 +30,6 @@
             padding-right: 20px;
         } 
 </style>
-<script src="jsfile/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="jsfile/converter.js"></script>
-<script type="text/javascript">
-	$(document).ready(function(){
-	     if (!$('#conveter').hasClass('active')) {
-	 		$('#conveter').addClass('active');
-	 	}
-	     });
-	</script>
 <title>Timezone Converter</title>
 </head>
 <body>

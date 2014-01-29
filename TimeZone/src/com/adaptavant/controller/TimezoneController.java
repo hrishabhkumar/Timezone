@@ -3,8 +3,10 @@ package com.adaptavant.controller;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.text.WordUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.adaptavant.timezone.converter.TimezoneListProvider;
 import com.adaptavant.timezone.services.DataListProvider;
 import com.adaptavant.timezone.services.LongLatDataProvider;
@@ -304,7 +307,7 @@ public class TimezoneController
 	 * this is temporary url.
 	 */
 	@RequestMapping("/uploaddata")
-	public void uploadTime(HttpServletRequest req, HttpServletResponse resp)
+	public void uploadTimezoneData(HttpServletRequest req, HttpServletResponse resp)
 	{
 		UploadData uploadData=new UploadData();
 		uploadData.uploadTime();
@@ -320,7 +323,7 @@ public class TimezoneController
 	 * 
 	 */
 	@RequestMapping(value="/getList")
-	public @ResponseBody String getList(HttpServletRequest req, @RequestBody String listRequired)
+	public @ResponseBody String getPlaceList(HttpServletRequest req, @RequestBody String listRequired)
 	{
 		JSONObject listRequiredJson=null;
 		try 
@@ -359,6 +362,7 @@ public class TimezoneController
 				{
 					logger.info("inside memcache of State");
 					JSONArray stateListJsonArray=(JSONArray) MCacheService.get("getStateList"+country);
+					System.out.println(stateListJsonArray);
 					responseJson=new JSONObject();
 					responseJson.put("list", stateListJsonArray);
 					responseJson.put("status", "success");
@@ -386,7 +390,8 @@ public class TimezoneController
 			{
 				logger.info("inside City");
 				String country=(String) listRequiredJson.get("country");
-				String state=(String) listRequiredJson.get("state");
+				String state=listRequiredJson.get("state").toString();
+				System.out.println(state);
 				JSONArray city=dataListProvider.getCityList(country, state);
 				logger.log(Level.INFO,city.toJSONString());
 				responseJson=new JSONObject();
@@ -545,10 +550,11 @@ public class TimezoneController
 					}
 				}
 				logger.info(termJSon.get("term").toString());
+				String searchKey=termJSon.get("term").toString().replace("\\", "");				
 				for(Object cityData: memcacheData)
 				{
 					JSONObject data=(JSONObject) cityData;
-					if(data.get("label").toString().toLowerCase().contains(termJSon.get("term").toString().toLowerCase()))
+					if(data.get("label").toString().toLowerCase().contains(searchKey.toLowerCase()))
 					{
 						responseArray.add(data);
 					}

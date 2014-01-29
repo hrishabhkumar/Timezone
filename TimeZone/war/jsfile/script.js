@@ -44,13 +44,14 @@ $(document).ready(function(){
 					};
 			dataString=JSON.stringify(dataString);
 			console.log(dataString) ;
+			$('#loginStatus').addClass('loader');
 			$.ajax({
 				url: "login",
 				type: "post",
 				dataType: "json",
 				contentType: "application/json",
 				data: dataString,
-				async: false,
+				async: true,
 				cache: false,
 				processData:false,
 				success: function(data){
@@ -58,9 +59,10 @@ $(document).ready(function(){
 						window.location.href = "/home";
 					}
 					else{
-						$('#loginFailed').fadeIn(5000);
-						$('#loginFailed').html("Login Failed!!!! Please Check You Username and Password").css("color", "red");
-						$('#loginFailed').fadeOut(5000);
+						$('#loginStatus').removeClass('loader');
+						$('#loginStatus').fadeIn(5000);
+						$('#loginStatus').html("Login Failed!!!! Please Check You Username and Password").addClass('failed');
+						$('#loginStatus').fadeOut(5000);
 						
 					}
 			      },
@@ -69,9 +71,9 @@ $(document).ready(function(){
 			});
 			}
 			else{
-				$('#loginFailed').fadeIn(5000);
-				$('#loginFailed').html("Login Failed!!!! Please Check You Username and Password").css("color", "red");
-				$('#loginFailed').fadeOut(5000);
+				$('#loginStatus').fadeIn(5000);
+				$('#loginStatus').html("Login Failed!!!! Please Check You Username and Password").addClass('failed');
+				$('#loginStatus').fadeOut(5000);
 			}
 		});
 		
@@ -85,25 +87,27 @@ $(document).ready(function(){
 						password: $('#password').val()
 						};
 				dataString=JSON.stringify(dataString);
+				$('#registerStatus').addClass('loader');
 				$.ajax({
 					url: "register",
 					type: "post",
 					dataType: "json",
 					contentType: "application/json",
 					data: dataString,
-					async: false,
+					async: true,
 					cache: false,
 					processData:false,
 					success: function(data){
+						$('#registerStatus').removeClass('loader');
 						if(data.status=="success"){
-							$('#registerFailed').html("Registration Successfull!!!! Please Wait while we redirect you to homepage.").css("color", "green");
-							$('#registerFailed').fadeOut(3000);
+							$('#registerStatus').html("Registration Successfull!!!! Please Wait while we redirect you to homepage.").addClass('success');
+							$('#registerStatus').fadeOut(3000);
 							window.setTimeout(function() {window.location.href = '/home';}, 1000);
 						}
 						else{
-							$('#registerFailed').fadeIn(5000);
-							$('#registerFailed').html(data.error).css("color", "red");
-							$('#registerFailed').fadeOut(5000);
+							$('#registerStatus').fadeIn(5000);
+							$('#registerStatus').html(data.error).addClass('failed');
+							$('#registerStatus').fadeOut(5000);
 							
 						}
 				      },

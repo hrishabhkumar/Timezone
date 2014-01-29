@@ -60,12 +60,12 @@ public class SearchByCity {
 	  				for (TimezoneJDO timeZoneJDO: results) 
 	  				{
 	  					cityDataJson=new JSONObject();
-	  					
 	  					cityDataJson.put("label", timeZoneJDO.getCity()+" "+timeZoneJDO.getState()+" "+timeZoneJDO.getCountry());
 	  					cityDataJson.put("city", timeZoneJDO.getCity());
 	  					cityDataJson.put("state", timeZoneJDO.getState());
 	  					cityDataJson.put("country", timeZoneJDO.getCountry());
 	  					cityDataJson.put("zipCode", timeZoneJDO.getZipCode());
+	  					cityDataJson.put("countryCode", timeZoneJDO.getCountryCode());
 	  					cityDataArray.add(cityDataJson);
 	  				}
 	  				

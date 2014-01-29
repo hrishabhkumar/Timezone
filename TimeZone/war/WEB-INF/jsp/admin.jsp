@@ -10,8 +10,9 @@
 		response.sendRedirect("/login.html");
 	}%> 
 	<!--- CSS --->
+	 <link href="css/bootstrap.min.css" rel="stylesheet">
+	 <!-- Java Script -->
 	<script src="jsfile/jquery-1.9.1.js"></script>
-	<link href="css/bootstrap.min.css" rel="stylesheet">
      <script src="js/bootstrap.min.js"></script>
      <script src="jsfile/admin.js"></script>
      <script type="text/javascript">
@@ -22,6 +23,7 @@
 		    setTimeout('date_time("'+id+'",'+offset+');','1000');
 		 }
      </script>
+    
 </head>
 <body>
 	<%

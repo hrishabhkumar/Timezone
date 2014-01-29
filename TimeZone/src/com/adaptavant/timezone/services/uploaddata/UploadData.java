@@ -2,6 +2,7 @@ package com.adaptavant.timezone.services.uploaddata;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.StringTokenizer;
@@ -13,11 +14,10 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.TimezoneJDO;
-import com.adaptavant.timezone.converter.TimezoneListProvider;
-import com.adaptavant.timezone.services.DataListProvider;
-import com.adaptavant.timezone.services.LongLatDataProvider;
-import com.adaptavant.timezone.services.SearchByCity;
 import com.adaptavant.utilities.MCacheService;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
 public class UploadData {
 	Logger logger=Logger.getLogger(UploadData.class.getName());
@@ -34,19 +34,30 @@ public class UploadData {
 			br=new BufferedReader(new FileReader("db.csv"));
 			while((line=br.readLine())!=null)
 			{	
-				System.out.println(line);
 				token=new StringTokenizer(line, "\t");
 				timezoneJDO=new TimezoneJDO();
 			while(token.hasMoreTokens())
 			{
 				String country=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+				country=Normalizer
+				           .normalize(country, Normalizer.Form.NFD)
+				           .replaceAll("[^\\p{ASCII}]", "");
 				System.out.println(token.countTokens());
 				String state=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+				state=Normalizer
+		           .normalize(state, Normalizer.Form.NFD)
+		           .replaceAll("[^\\p{ASCII}]", "");
 				String city=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+				city=Normalizer
+		           .normalize(city, Normalizer.Form.NFD)
+		           .replaceAll("[^\\p{ASCII}]", "");
 				String latitude=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 				String longitude=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 				
 				String countryCode=token.nextToken().replace("\"", "").toUpperCase();
+				countryCode=Normalizer
+		           .normalize(countryCode, Normalizer.Form.NFD)
+		           .replaceAll("[^\\p{ASCII}]", "");
 				String timeZone=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 				String rawOffsetstr=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 				
@@ -77,6 +88,7 @@ public class UploadData {
 					dstOffset=+(hours+min);  
 				}
 				String zipCode=token.nextToken().replace("\"", "");
+				
 				timezoneJDO.setCountry(country);
 				timezoneJDO.setCity(city);
 				timezoneJDO.setDstOffset(dstOffset);
@@ -95,17 +107,11 @@ public class UploadData {
 			pm.makePersistentAll(timezoneDataList);
 			pm.close();
 			MCacheService.removeAll();
-			DataListProvider dataListProvider=new DataListProvider();;
-			TimezoneListProvider listprovider=new TimezoneListProvider();
-			LongLatDataProvider longLatDataProvider=new LongLatDataProvider();
-			SearchByCity searchByCity=new SearchByCity();
-			int limit=1000;
-			String cursorString=null;
-			
-			dataListProvider.getCountryList(limit, cursorString);
-			listprovider.getTimezoneConvertorData(limit, cursorString);
-			longLatDataProvider.getlongitudeList(limit, cursorString);
-			searchByCity.getCityJson(limit, cursorString, "getCityData1");
+			Queue queue = QueueFactory.getQueue("subscription-queue");
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "country"));
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "converterData"));
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "longAndLat"));
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "cityData"));
 		}
 		catch (Exception e) 
 		{

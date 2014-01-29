@@ -4,10 +4,10 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link href="css/bootstrap.min.css" rel="stylesheet">
 <script src="jsfile/jquery-1.9.1.js"></script>
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-     <script src="js/bootstrap.min.js"></script>
-     <script src="jsfile/script.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="jsfile/script.js"></script>
 <title>Register</title>
 <script type="text/javascript">
 $(document).ready(function(){
@@ -16,6 +16,26 @@ $(document).ready(function(){
 	}
     });
 </script>
+<style >
+	.loader 
+	{
+		position: fixed;
+		left: 0px;
+		top: 0px;
+		width: 100%;
+		height: 100%;
+		z-index: 9999;
+		background: url('img/page-loader.gif') 50% 50% no-repeat rgb(249,249,249);
+	}
+	.failed
+	{
+		color: red;
+	}
+	.success
+	{
+		color: green;
+	}
+</style>
 </head>
 <body>
 	<jsp:include page="header.jsp"></jsp:include>
@@ -27,7 +47,7 @@ $(document).ready(function(){
     			<div class="container">
     			Please fill following details: 
 	    			<form action="#"  class="form-horizontal" role=form id="registerForm">
-	    			<span id=registerFailed></span>
+	    			<span id=registerStatus></span>
 	    			 	<div class="form-group">
 	    			 	<div class="col-xs-4">
 	    			 		<label for="username">User Name:</label>

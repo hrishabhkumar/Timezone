@@ -10,8 +10,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!--- CSS --->
-	<script src="../jsfile/jquery-1.9.1.js"></script>
 	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<script src="../jsfile/jquery-1.9.1.js"></script>
      <script src="../js/bootstrap.min.js"></script>
      <script src="../jsfile/recovery.js"></script>
 </head>

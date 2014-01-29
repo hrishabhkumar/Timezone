@@ -12,6 +12,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.TimezoneJDO;
@@ -50,8 +51,8 @@ public class DataListProvider {
 				cursorString=cursor.toWebSafeString();
 				if (!results.isEmpty()) {
 					Collection<String> country=new TreeSet<String>();
-					for (TimezoneJDO tj: results) {
-						country.add(tj.getCountry());
+					for (TimezoneJDO timeZone: results) {
+						country.add(timeZone.getCountry()+","+timeZone.getCountryCode());
 					}
 					if(MCacheService.get(keyString)!=null){
 					country.addAll((TreeSet<String>) MCacheService.get(keyString));
@@ -64,7 +65,13 @@ public class DataListProvider {
 					else {
 						Collection<String> countrySet=(TreeSet<String>) MCacheService.get(keyString);
 						JSONArray countryJsonArray=new JSONArray();
-						countryJsonArray.addAll(countrySet);
+						for(String countryNameandCode: countrySet){
+							JSONObject countryData=new JSONObject();
+							countryData.put("country", countryNameandCode.substring(0, countryNameandCode.indexOf(",")));
+							countryData.put("countryCode", countryNameandCode.substring(countryNameandCode.indexOf(",")+1));
+							countryData.put("label", countryNameandCode.substring(countryNameandCode.indexOf(",")+1)+" "+countryNameandCode.substring(0, countryNameandCode.indexOf(",")));
+							countryJsonArray.add(countryData);
+						}
 						logger.log(Level.INFO,"Updating Memcache with country List");
 						MCacheService.set("getCountryList", countryJsonArray);
 						MCacheService.remove(keyString);
@@ -107,9 +114,9 @@ public class DataListProvider {
 		  if (!results.isEmpty()) 
 		  {
 			  Collection<String> state=new TreeSet<String>();
-			  for (TimezoneJDO tj: results) 
+			  for (TimezoneJDO timezoneJDO: results) 
 			  {
-				state.add(tj.getState());
+				state.add(timezoneJDO.getState());
 			  }
 			  if(MCacheService.get(keyString)!=null)
 			  {
@@ -118,18 +125,19 @@ public class DataListProvider {
 			  MCacheService.set(keyString, state);
 			  if(results.size()==limit)
 			  {
-				getStateList(country, limit, cursorString);
+				getStateList(country, limit, cursor.toWebSafeString());
+				
 			  }
-			  else 
-			  {
-				Collection<String> stateSet=(TreeSet<String>) MCacheService.get(keyString);
-				stateJsonArray=new JSONArray();
-				stateJsonArray.addAll(stateSet);
-				logger.log(Level.INFO,"Updating Memcache with state List");
-				MCacheService.set("getStateList"+country, stateJsonArray);
-				MCacheService.remove(keyString);
-			}
+			  else{
+				  Collection<String> stateSet=(TreeSet<String>) MCacheService.get(keyString);
+				  stateJsonArray=new JSONArray();
+				  stateJsonArray.addAll(stateSet);
+				  logger.log(Level.INFO,"Updating Memcache with state List");
+				  MCacheService.set("getStateList"+country, stateJsonArray);
+				  MCacheService.remove(keyString);
+			  }
 			  return stateJsonArray;
+			  
 		  }
 		  else
 		  {

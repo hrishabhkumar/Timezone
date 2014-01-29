@@ -1,8 +1,9 @@
 $(document).ready(function(){
 	//Ajax call to get country city and state list.
 	 function ajax_call(name, dataString) {
-		$('#seachButton').attr("disabled",true)
+		$('#seachButton').attr("disabled",true);
 		 var id='#'+name;
+		 $(id).addClass('ui-autocomplete-loading');
 		 $.ajax({
 				url: "getList",
 				type: "post",
@@ -18,8 +19,18 @@ $(document).ready(function(){
 						if(listdata.length!=0){
 							var output='<option selected=true value=0>select '+name+'</option>';
 							for (var i in listdata) {
-								output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
+								if(typeof(listdata[i])=='string')
+								{
+									output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
+								}
+								else
+								{
+									console.log(listdata[i].countryCode);
+									output+='<option value="'+listdata[i].country+'">'+listdata[i].country+'</option>';
+								}
+								
 							}
+							$(id).removeClass('ui-autocomplete-loading');
 							$(id).html(output);
 							$('#seachButton').attr("disabled",false)
 						}
@@ -29,6 +40,7 @@ $(document).ready(function(){
 					}
 			      },
 			    error: function(data){
+			    	console.log(data);
 			    }
 			});
 	    }
@@ -51,46 +63,46 @@ $(document).ready(function(){
 					$('#resultHeader').empty();
 					$('#result').removeAttr('style');
 					$('#resultHeader').html("<h1>Your timeZone Data:</h1>");
-					var output='<div class="form-horizontal">';
+					var output='<div class="form-horizontal col-lg-6">';
 					for (var i in timezonedata) {
-						output+='<div class="form-group"><label class="col-sm-3 control-label ">timeZoneID:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].timeZoneID+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label ">timeZoneID:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].timeZoneID+'</p></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">TimeZone Name:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].timeZoneName+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">TimeZone Name:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].timeZoneName+'</p></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">Country :</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].country+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">Country :</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].country+'</p></div></div>';
 
-						output+='<div class="form-group"><label class="col-sm-3 control-label">Country Code :</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].countryCode+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">Country Code :</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].countryCode+'</p></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">State:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].state+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">State:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].state+'</p></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">City:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].city+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">City:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].city+'</p></div></div>';
 
-						output+='<div class="form-group"><label class="col-sm-3 control-label">Zip Code:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].zipCode+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">Zip Code:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].zipCode+'</p></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">Longitude:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].longitude+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">Longitude:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].longitude+'</p></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">Latitude:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].latitude+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">Latitude:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].latitude+'</p></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">Raw Offset:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].rawOffset+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">Raw Offset:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].rawOffset+'</p></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">DST Offset:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static">'+timezonedata[i].dstOffset+'</p></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">DST Offset:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].dstOffset+'</p></div></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">Current DST Time:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static" id="'+timezonedata[i].city+'dst"></p></div></div>';
+						output+='<div class="form-horizontal col-lg-6 panel  panel-default"><div class="form-group"><label class="col-sm-4 control-label">Current DST Time:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static" id="'+timezonedata[i].city+'dst"></p></div></div>';
 						
-						output+='<div class="form-group"><label class="col-sm-3 control-label">Current UTC Time:</label>';
-						output+='<div class="col-sm-9"><p class="form-control-static" id="'+timezonedata[i].city+'raw"></p></div></div></div>';
+						output+='<div class="form-group"><label class="col-sm-4 control-label">Current UTC Time:</label>';
+						output+='<div class="col-sm-6"><p class="form-control-static" id="'+timezonedata[i].city+'raw"></p></div></div></div>';
 						
 						var rawOffset=parseInt(timezonedata[i].rawOffset)+data.currentTime;
 						var dstOffset=parseInt(timezonedata[i].dstOffset)+data.currentTime;
@@ -113,7 +125,7 @@ $(document).ready(function(){
 	});
 	}
 	//Getting Country list.
-	$(function(){
+	$('#searchByPlaceTab').click(function(){
 	var str="country";	
 	var dataString={
 			required: str
@@ -218,6 +230,7 @@ $(document).ready(function(){
 		            	term: $.ui.autocomplete.escapeRegex(request.term)
 		            };
 		            dataString=JSON.stringify(dataString);
+		            console.log($.ui.autocomplete.escapeRegex(request.term));
 		            $.ajax({
 						url: "timezonebycity",
 						type: "post",
@@ -228,7 +241,10 @@ $(document).ready(function(){
 						cache: true,
 						processData:false,
 						success: function(data){
-							response(data);
+							var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+					          response( $.grep( data, function( item ){
+					              return (matcher.test( item.city))+(matcher.test( item.state))+(matcher.test( item.country));
+					          }) );
 						}
 		            })
 				},
@@ -246,7 +262,7 @@ $(document).ready(function(){
 		    .data( "ui-autocomplete" )._renderItem = function( ul, item ) 
 		    {
 		      return $( "<li>" )
-		        .append( "<a>" + item.city + "<br>" + item.state+", "+item.country+ "</a></li>" )
+		        .append( "<a>" + item.city + "<i class='glyphicon bfh-flag-"+item.countryCode+" pull-right'></i><br>" + item.state+", "+item.country+ "</a></li>" )
 		        .appendTo( ul );
 		    };
 		});
@@ -299,10 +315,11 @@ $(document).ready(function(){
 			}
 			$('#searchByCity').attr('disabled', false);
 		});
+		//search city submit action.
 		$('#serachByCity').submit(function(event){
 			event.preventDefault();
 			$('#searchByCity').attr('disabled', true);
-			if(zip!=null&&zip!='')
+			if(zip!=null&&zip!=''&&($('#cityName').val()!=''))
 			{
 				$('#cityNameSpan').empty();
 				var place={
@@ -329,12 +346,150 @@ $(document).ready(function(){
 		{
      		$('#timezone').addClass('active');
      	}
+		// Empty result Field and show clicked tab.
 		$('#myTab a').click(function (e) {
 			  e.preventDefault()
+			  $('#resultHeader').empty();
+			  $('#result').empty();
 			  $(this).tab('show');
 		});
-		$('#phoneNumber').change(function(){
-			alert($('#phoneNumber').val());
+		//Search By ZipCode.
+		var countryData;
+		$('#searchByZipTab').click(function(){
+			 var str="country";	
+	        	var dataString={
+	        			required: str
+	        	};
+	        	dataString=JSON.stringify(dataString);
+	            $.ajax({
+					url: "getList",
+					type: "post",
+					dataType: "json",
+					contentType: "application/json",
+					data: dataString,
+					async: true,
+					cache: true,
+					processData:false,
+					success: function(data){
+						countryData=data.list;
+					}
+		})
 		});
+		$(function(){
+			$('#countryName').autocomplete({
+				minLength: 1,
+				source: function(request, response){
+					$('#zip').val('');
+					$("#zipResult").empty();
+					var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+					response( $.grep( countryData, function( item ){
+			              return (matcher.test( item.countryCode))+(matcher.test( item.country));
+			          }) );
+				},
+				focus: function( event, ui ) {
+					$( "#countryName" ).val( ui.item.country);
+					$( "#countryCode" ).val( ui.item.countryCode);
+					event.preventDefault();
+				},
+				select: function( event, ui ) {
+					$( "#countryName" ).val( ui.item.country);
+					$( "#countryCode" ).val( ui.item.countryCode);
+					event.preventDefault();
+				}
+			})
+		    .data( "ui-autocomplete" )._renderItem = function( ul, item ) 
+		    {
+		      return $( "<li>" )
+		        .append( "<a>" + item.country + "<i class='glyphicon bfh-flag-"+item.countryCode+" pull-right'></i></a></li>" )
+		        .appendTo( ul );
+		    }
+		});
+		
+		//zip code api call
+			$('#zip').keyup(function(event) {
+				
+				var zipCode=$('#zip').val();
+				console.log(zipCode);
+				var countryCode=$('#countryCode').val();
+					//$.getJSON("http://api.zippopotam.us/"+countryCode+"/"+zipCode,function(data){
+					$.ajax({
+						url: "http://api.zippopotam.us/"+countryCode+"/"+zipCode,
+						dataType: "json",
+						success: function(data){
+							console.clear();
+							console.log('zip found');
+							$('#zipDiv').removeClass('has-error');
+							$('#zipDiv').addClass('has-success');
+							$('#zipSpan').empty();
+							var output='<div class="row"><div class="col-sm-4"><label for="zipCity">Place:</label><select id=zipCity class=form-control>';
+							output+='<option selected=true value=0>select place</option>';
+							var places=data.places;
+							for (var i in places)
+							{
+								output+='<option value="'+places[i].longitude+','+places[i].latitude+'">'+places[i]['place name']+'</option>';
+							}
+							output+='</select></div></div>';
+							output+='<div class="row"><div class="col-sm-4"><label for="StateName">State:</label><input id=Zipcity value="'+places[0].state+'" class=form-control readonly>';
+							output+='<span id="stateNameSpan" class="help-block"></span></div></div>';
+							$("#zipResult").html(output);
+						},
+						error: function(data){
+							console.clear();
+							$('#zipDiv').removeClass('has-success');
+							console.log('zip not found')
+							$('#zipSpan').html("zip not found").css("color", 'red');
+							$('#zipDiv').addClass('has-error');
+							$("#zipResult").empty();
+						}
+					})
+				
+				event.preventDefault();
+			});
+			$(document).on('change', '#zipCity', function(){
+				var longitude=$('#zipCity').val().split(",")[0];
+				var latitude=$('#zipCity').val().split(",")[1];
+				var place={
+						longitude: longitude,
+						latitude: latitude
+						};
+				var dataString={
+						"key": $('#keyString').val(),
+						"place": place
+					};
+				dataString={
+					"required":"timezoneData",
+					"data": dataString
+				};
+				dataString=JSON.stringify(dataString);
+				getTimezoneData(dataString);
+			});
+			
+			$('#serachByZip').submit(function(event){
+				event.preventDefault();
+				if($('#zipCity').length!=0)
+					{
+					var longitude=$('#zipCity').val().split(",")[0];
+					var latitude=$('#zipCity').val().split(",")[1];
+					var place={
+							longitude: longitude,
+							latitude: latitude
+							};
+					var dataString={
+							"key": $('#keyString').val(),
+							"place": place
+						};
+					dataString={
+						"required":"timezoneData",
+						"data": dataString
+					};
+					dataString=JSON.stringify(dataString);
+					getTimezoneData(dataString);
+					}
+				else
+				{
+					$('#zipSpan').html("Please enter zipcode").css("color", "red");
+				}
+			});
+		
 });
 	

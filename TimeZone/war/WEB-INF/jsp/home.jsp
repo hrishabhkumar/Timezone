@@ -7,10 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Welcome</title>
 
-<%if(session.getAttribute("key")==null){
-		response.sendRedirect("/login.html");
-	}%> 
-	<link href="css/bootstrap.min.css" rel="stylesheet">
+	 <link href="css/bootstrap.min.css" rel="stylesheet">
 	<script src="jsfile/jquery-1.9.1.js"></script>
      <script src="js/bootstrap.min.js"></script>
      <script src="jsfile/home.js"></script>
@@ -24,6 +21,11 @@
  	    setTimeout('getClock('+rawOffset+',"'+ id+'")','1000');
  	}
      </script>
+     <style >
+     	.loading{
+     		background: white url('img/loader.gif') left center no-repeat;
+     	}
+     </style>
 </head>
 <body>
 	<%
