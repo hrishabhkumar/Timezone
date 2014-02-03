@@ -1,4 +1,14 @@
 $(document).ready(function(){
+	$('#logout').click(function(event){
+		var leave=confirm("Do you want to logout?");
+		if(leave){
+			event.preventDefault;
+			window.location.assign("/logout.html");
+		}
+		else{
+			event.preventDefault();
+		}
+	});
 	$(function() {
 		var datalist;
 		var dataString={

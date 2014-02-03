@@ -4,7 +4,6 @@
 package com.adaptavant.jdo;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.Index;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -23,6 +22,33 @@ public class TimezoneJDO {
     private Key key;
 	
 	@Persistent
+	private String city;
+	
+	@Persistent
+	private String cityCode;
+	
+	@Persistent
+	private String state;
+	
+	@Persistent
+	private String stateCode;
+
+	@Persistent
+	private String country;
+
+	@Persistent
+	private String countryCode;
+	
+	@Persistent
+	private String zipCode;
+	
+	@Persistent
+	private String longitude;
+	
+	@Persistent
+	private String latitude;
+	
+	@Persistent
 	private String timeZoneId;
 	
 	@Persistent
@@ -33,28 +59,6 @@ public class TimezoneJDO {
 	
 	@Persistent
 	private int dstOffset;
-	
-	@Persistent
-	private String state;
-	
-	@Persistent
-	private String city;
-	
-	@Persistent
-	@Index
-	private String country;
-	
-	@Persistent
-	private String longitude;
-	
-	@Persistent
-	private String latitude;
-	
-	@Persistent
-	private String countryCode;
-	
-	@Persistent
-	private String zipCode;
 	
 	/**
 	 * @return the key
@@ -114,7 +118,7 @@ public class TimezoneJDO {
 
 
 	/**
-	 * @param rawOffset2 the rawOffset to set
+	 * @param rawOffset the rawOffset to set
 	 */
 	public void setRawOffset(long rawOffset) {
 		this.rawOffset = rawOffset;
@@ -130,7 +134,7 @@ public class TimezoneJDO {
 
 
 	/**
-	 * @param dstOffset2 the dstOffset to set
+	 * @param dstOffset the dstOffset to set
 	 */
 	public void setDstOffset(int dstOffset) {
 		this.dstOffset = dstOffset;
@@ -232,7 +236,6 @@ public class TimezoneJDO {
 		this.countryCode = countryCode;
 	}
 
-
 	/**
 	 * @return the zipCode
 	 */
@@ -248,5 +251,36 @@ public class TimezoneJDO {
 		this.zipCode = zipCode;
 	}
 
+
+	/**
+	 * @return the cityCode
+	 */
+	public String getCityCode() {
+		return cityCode;
+	}
+
+
+	/**
+	 * @param cityCode the cityCode to set
+	 */
+	public void setCityCode(String cityCode) {
+		this.cityCode = cityCode;
+	}
+
+
+	/**
+	 * @return the stateCode
+	 */
+	public String getStateCode() {
+		return stateCode;
+	}
+
+
+	/**
+	 * @param stateCode the stateCode to set
+	 */
+	public void setStateCode(String stateCode) {
+		this.stateCode = stateCode;
+	}
 
 }

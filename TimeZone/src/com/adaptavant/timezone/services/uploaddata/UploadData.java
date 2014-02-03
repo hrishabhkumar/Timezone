@@ -15,6 +15,8 @@ import org.apache.commons.lang3.text.WordUtils;
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.TimezoneJDO;
 import com.adaptavant.utilities.MCacheService;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
@@ -31,37 +33,47 @@ public class UploadData {
 		Collection<TimezoneJDO> timezoneDataList=new ArrayList<TimezoneJDO>();
 		try
 		{
-			br=new BufferedReader(new FileReader("db.csv"));
+			br=new BufferedReader(new FileReader("worldDB.csv"));
+			int i=0;
+			int j=0;
 			while((line=br.readLine())!=null)
 			{	
+				
 				token=new StringTokenizer(line, "\t");
 				timezoneJDO=new TimezoneJDO();
 			while(token.hasMoreTokens())
 			{
-				String country=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
-				country=Normalizer
-				           .normalize(country, Normalizer.Form.NFD)
-				           .replaceAll("[^\\p{ASCII}]", "");
-				System.out.println(token.countTokens());
-				String state=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
-				state=Normalizer
-		           .normalize(state, Normalizer.Form.NFD)
-		           .replaceAll("[^\\p{ASCII}]", "");
 				String city=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 				city=Normalizer
 		           .normalize(city, Normalizer.Form.NFD)
 		           .replaceAll("[^\\p{ASCII}]", "");
 				String latitude=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 				String longitude=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+				String cityCode=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+				cityCode=Normalizer
+		           .normalize(cityCode, Normalizer.Form.NFD)
+		           .replaceAll("[^\\p{ASCII}]", "");
 				
+				String country=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+				country=Normalizer
+				           .normalize(country, Normalizer.Form.NFD)
+				           .replaceAll("[^\\p{ASCII}]", "");
 				String countryCode=token.nextToken().replace("\"", "").toUpperCase();
 				countryCode=Normalizer
 		           .normalize(countryCode, Normalizer.Form.NFD)
 		           .replaceAll("[^\\p{ASCII}]", "");
+				String state=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
+				state=Normalizer
+		           .normalize(state, Normalizer.Form.NFD)
+		           .replaceAll("[^\\p{ASCII}]", "");
+				String stateCode=token.nextToken().replace("\"", "").toUpperCase();
+				stateCode=Normalizer
+		           .normalize(stateCode, Normalizer.Form.NFD)
+		           .replaceAll("[^\\p{ASCII}]", "");
+				
 				String timeZone=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 				String rawOffsetstr=WordUtils.capitalizeFully(token.nextToken().replace("\"", ""));
 				
-				System.out.println(rawOffsetstr);
 				int sign=rawOffsetstr.substring(0,1).toCharArray()[0];
 				int hours=Integer.parseInt(rawOffsetstr.substring(1, rawOffsetstr.indexOf(":")))*1000*60*60;
 				int min=Integer.parseInt(rawOffsetstr.substring(rawOffsetstr.indexOf(':')+1, rawOffsetstr.length()))*60*1000;
@@ -88,22 +100,34 @@ public class UploadData {
 					dstOffset=+(hours+min);  
 				}
 				String zipCode=token.nextToken().replace("\"", "");
-				
-				timezoneJDO.setCountry(country);
+				Key key=KeyFactory.createKey(TimezoneJDO.class.getSimpleName(), country+state+city);
+				timezoneJDO.setKey(key);
 				timezoneJDO.setCity(city);
-				timezoneJDO.setDstOffset(dstOffset);
-				timezoneJDO.setRawOffset(rawOffset);
+				timezoneJDO.setCityCode(cityCode);
 				timezoneJDO.setState(state);
-				timezoneJDO.setTimeZoneId(timeZone);
-				timezoneJDO.setTimeZoneName(timeZone.substring(timeZone.lastIndexOf('/')+1));
-				timezoneJDO.setLatitude(latitude);
-				timezoneJDO.setLongitude(longitude);
+				timezoneJDO.setStateCode(stateCode);
+				timezoneJDO.setCountry(country);
 				timezoneJDO.setCountryCode(countryCode);
 				timezoneJDO.setZipCode(zipCode);
+				timezoneJDO.setLatitude(latitude);
+				timezoneJDO.setLongitude(longitude);
+				timezoneJDO.setTimeZoneId(timeZone);
+				timezoneJDO.setTimeZoneName(WordUtils.capitalizeFully(timeZone.substring(timeZone.lastIndexOf('/')+1)));
+				timezoneJDO.setRawOffset(rawOffset);
+				timezoneJDO.setDstOffset(dstOffset);
+				
 			}
+			if(i==10000)
+			{
+				pm.makePersistentAll(timezoneDataList);
+				timezoneDataList=new ArrayList<TimezoneJDO>();
+				i=0;
+			}
+			i++;
+			j++;
 			timezoneDataList.add(timezoneJDO);
 			}
-			br.close();
+			System.out.println(j);
 			pm.makePersistentAll(timezoneDataList);
 			pm.close();
 			MCacheService.removeAll();
@@ -116,6 +140,7 @@ public class UploadData {
 		catch (Exception e) 
 		{
 			logger.warning(e.getMessage());
+			System.out.println("error occured");
 		}
 	}
 }

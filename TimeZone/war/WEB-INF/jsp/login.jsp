@@ -12,7 +12,17 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="jsfile/script.js"></script>
 <script>$(document).ready(function(){if(!$('#login').hasClass('active')){$('#login').addClass('active');}});</script>
-<style>.loader{position:fixed;left:0px;top:0px;width:100%;height:100%;z-index:9999;background:transparent url('img/page-loader.gif') 50% 50% no-repeat rgb(249,249,249);}
+<style>
+.loader
+{
+position:fixed;
+left:0px;
+top:0px;
+width:100%;
+height:100%;
+z-index:9999;
+background:transparent url('img/page-loader.gif') 50% 50% no-repeat ;
+}
 .failed{color:red;}
 .success{color:green;}</style>
 </head>

@@ -2,9 +2,9 @@
 <cronentries>
   
   <cron>
-    <url>/dailyMemcacheClearance</url>
+    <url>/monthlyMemcacheClearance</url>
     <description>Clear memecache daily</description>
-    <schedule>every day 00:00</schedule>
+    <schedule>1 of month 00:00</schedule>
     <timezone>Asia/Kolkata</timezone>
   </cron>
   

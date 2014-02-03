@@ -35,6 +35,16 @@
   		 .ui-helper-hidden {
 		display: block;
 		}
+		.loader
+		{
+			position:fixed;
+			left:0px;
+			top:0px;
+			width:100%;
+			height:100%;
+			z-index:9999;
+			background:transparent url('img/page-loader.gif') 50% 50% no-repeat ;
+		}
      </style>
      <script type="text/javascript">
      function date_time(id, offset)
@@ -76,7 +86,7 @@
 						<div class='col-sm-4'>
 							<label for='cityName '>City:</label>
 		  						<input class="form-control" id='cityName' placeholder='City' >
-							<span id='cityNameSpan ' class='help-block'></span>
+							<span id="cityNameSpan" class='help-block'></span>
 						</div>
 					</div>
 					<div class='row'>
@@ -109,8 +119,7 @@
 							<span id="zipSpan" class='help-block'></span>
 						</div>
 					</div>
-					<div id='zipResult'></div>
-					<div class='row'>
+					<div id="zipResult"></div>					<div class='row'>
 						<div class=col-sm-4>
 							<button type='submit' class='btn btn-success form-control' id='searchByCity'>Search</button>
 						</div>

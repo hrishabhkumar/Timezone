@@ -1,4 +1,5 @@
 $(document).ready(function(){
+	
 	$('#recoverySubmit').attr("disabled", true);
 	function validateEmail(){
 		var regemail = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;

@@ -38,7 +38,7 @@ public class Timezone
 	 * @return Timezone data as JSON String.
 	 */
 	@SuppressWarnings("unchecked")
-	public JSONObject getTimezoneData(String key, String city, String state, String country, String countryCode, String zipCode, String latitude, String longitude)
+	public JSONObject getTimezoneData(String key, String city, String state,String stateCode, String country, String countryCode, String zipCode, String latitude, String longitude)
 	{
 		JSONObject reponseJson=null;
 		String distance=null;
@@ -81,10 +81,10 @@ public class Timezone
 				logger.info(query.toString());
 			}
 			//Query for state and Country code
-			else if(state!=null&&countryCode!=null)
+			else if(stateCode!=null&&countryCode!=null)
 			{
 				query = pm.newQuery(TimezoneJDO.class,
-	                	"state == '" +state+"' && countryCode == '"+countryCode+"'");
+	                	"stateCode == '" +stateCode+"' && countryCode == '"+countryCode+"'");
 				query.setRange(0,1);
 				logger.info(query.toString());
 			}
@@ -133,6 +133,7 @@ public class Timezone
 						timezoneDataJson.put("country", timezonejdo.getCountry());
 						timezoneDataJson.put("countryCode", timezonejdo.getCountryCode());
 						timezoneDataJson.put("state", timezonejdo.getState());
+						timezoneDataJson.put("stateCode", timezonejdo.getStateCode());
 						timezoneDataJson.put("longitude", timezonejdo.getLongitude());
 						timezoneDataJson.put("latitude", timezonejdo.getLatitude());
 						timezoneDataJson.put("timeZoneID", timezonejdo.getTimeZoneId());
@@ -159,8 +160,8 @@ public class Timezone
 				{
 					reponseJson=new JSONObject();
 					reponseJson.put("data",null);
-					reponseJson.put("status", "error");
-					return null;
+					reponseJson.put("status", "notFound");
+					return reponseJson;
 			  }
 			} 
 			finally 

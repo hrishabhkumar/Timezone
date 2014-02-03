@@ -1,4 +1,14 @@
 $(document).ready(function(){
+	$('#logout').click(function(event){
+		var leave=confirm("Do you want to logout?");
+		if(leave){
+			event.preventDefault;
+			window.location.assign("/logout.html");
+		}
+		else{
+			event.preventDefault();
+		}
+	});
 	//Ajax call to get country city and state list.
 	 function ajax_call(name, dataString) {
 		$('#seachButton').attr("disabled",true);
@@ -25,7 +35,6 @@ $(document).ready(function(){
 								}
 								else
 								{
-									console.log(listdata[i].countryCode);
 									output+='<option value="'+listdata[i].country+'">'+listdata[i].country+'</option>';
 								}
 								
@@ -46,6 +55,8 @@ $(document).ready(function(){
 	    }
 	 //Ajax call to get timezone details
 	function getTimezoneData(dataString){
+		$('#result').empty();
+		$('#result').addClass('loader');
 		$.ajax({
 			url: "getList",
 			type: "post",
@@ -62,6 +73,7 @@ $(document).ready(function(){
 					var totalrawOffset;
 					$('#resultHeader').empty();
 					$('#result').removeAttr('style');
+					$('#result').removeClass('loader');
 					$('#resultHeader').html("<h1>Your timeZone Data:</h1>");
 					var output='<div class="form-horizontal col-lg-6">';
 					for (var i in timezonedata) {
@@ -72,7 +84,7 @@ $(document).ready(function(){
 						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].timeZoneName+'</p></div></div>';
 						
 						output+='<div class="form-group"><label class="col-sm-4 control-label">Country :</label>';
-						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].country+'</p></div></div>';
+						output+='<div class="col-sm-6"><p class="form-control-static"><i class="glyphicon bfh-flag-'+timezonedata[i].countryCode+' pull-left"></i>'+timezonedata[i].country+'</p></div></div>';
 
 						output+='<div class="form-group"><label class="col-sm-4 control-label">Country Code :</label>';
 						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].countryCode+'</p></div></div>';
@@ -116,10 +128,12 @@ $(document).ready(function(){
 					$('#result').html(output);
 				}
 				else{
+					$('#result').removeClass('loader');
 					$('#result').html("Sorry!! there is some error").css("color", "red");
 				}
 			},
 			error: function(data){
+				$('#result').removeClass('loader');
 				$('#result').html("Sorry!! there is some error").css("color", "red");
 			}
 	});
@@ -241,11 +255,18 @@ $(document).ready(function(){
 						cache: true,
 						processData:false,
 						success: function(data){
+							$('#cityNameSpan').empty();
+							$('#cityName').removeClass("ui-autocomplete-loading");
 							var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
 					          response( $.grep( data, function( item ){
 					              return (matcher.test( item.city))+(matcher.test( item.state))+(matcher.test( item.country));
 					          }) );
-						}
+						},
+		            	error: function(data){
+		            		console.clear();
+		            		$('#cityNameSpan').html("city not found").css("color", "red");
+		            		$('#cityName').removeClass("ui-autocomplete-loading");
+		            	}
 		            })
 				},
 				focus: function( event, ui ) {
@@ -294,32 +315,12 @@ $(document).ready(function(){
 			getTimezoneData(dataString);
 			$('#searchByCity').attr('disabled', false);
 		});
-		$('#cityName').on( "autocompletechange", function( event, ui ) {
-			$('#searchByCity').attr('disabled', true);
-			if(zip!=null&&zip!='')
-			{
-				$('#cityNameSpan').empty();
-				var place={
-						zipCode: zip
-						};
-				var dataString={
-						"key": $('#keyString').val(),
-						"place": place
-					};
-				dataString={
-					"required":"timezoneData",
-					"data": dataString
-				};
-				dataString=JSON.stringify(dataString);
-				getTimezoneData(dataString);
-			}
-			$('#searchByCity').attr('disabled', false);
-		});
+		
 		//search city submit action.
 		$('#serachByCity').submit(function(event){
 			event.preventDefault();
 			$('#searchByCity').attr('disabled', true);
-			if(zip!=null&&zip!=''&&($('#cityName').val()!=''))
+			if(zip!=null&&zip!=''&&($('#cityName').val()!='')&&($('#cityName').val()!=null))
 			{
 				$('#cityNameSpan').empty();
 				var place={
@@ -490,6 +491,6 @@ $(document).ready(function(){
 					$('#zipSpan').html("Please enter zipcode").css("color", "red");
 				}
 			});
-		
+			
 });
 	

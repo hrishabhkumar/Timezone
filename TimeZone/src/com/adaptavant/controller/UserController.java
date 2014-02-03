@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -278,15 +277,15 @@ public class UserController
 	 * @param model
 	 * @return changePassword page if passed else login page with error message.
 	 */
-	@RequestMapping(value="/recover", params={"userid", "tempPass"}, method=RequestMethod.GET)
-	public ModelAndView recoverPass(HttpServletRequest req, HttpServletResponse resp, ModelMap model)
+	@RequestMapping(value="/recover", params={"userid", "tpass"}, method=RequestMethod.GET)
+	public ModelAndView recoverPass(HttpServletRequest req, HttpServletResponse resp)
 	{
 		try
 		{
 			persistenceManager =PMF.getPMF().getPersistenceManager();
 			String key=KeyFactory.createKeyString(CustomerJDO.class.getSimpleName(), req.getParameter("userid"));
 			CustomerJDO customerObj=persistenceManager.getObjectById(CustomerJDO.class, key);
-			String tempPass=req.getParameter("tempPass");
+			String tempPass=req.getParameter("tpass");
 			if(customerObj.getEmail().equalsIgnoreCase(req.getParameter("userid"))&&customerObj.getPassword().equals(tempPass))
 			{
 				req.getSession().setAttribute("recover", "ok");

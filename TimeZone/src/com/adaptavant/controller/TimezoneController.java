@@ -25,6 +25,9 @@ import com.adaptavant.timezone.services.SearchByCity;
 import com.adaptavant.timezone.services.Timezone;
 import com.adaptavant.timezone.services.uploaddata.UploadData;
 import com.adaptavant.utilities.MCacheService;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
 
 @Controller
@@ -58,10 +61,11 @@ public class TimezoneController
 			JSONObject requestJson=new JSONObject();
 			requestJson.put("place", placeJson);
 			requestJson.put("key", key);
-			return timezoneAction(req, requestJson.toJSONString());
+			return timezoneAction(req, resp, requestJson.toJSONString());
 		}
 		else
 		{
+			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return "please login..";
 		}
 	}
@@ -73,24 +77,25 @@ public class TimezoneController
 	 * this is rest client URL will used to find time zone data using 
 	 * country code and state name
 	 */
-	@RequestMapping(value="/timezone",params={"countryCode", "state"}, method=RequestMethod.GET)
+	@RequestMapping(value="/timezone",params={"countryCode", "stateCode"}, method=RequestMethod.GET)
 	public @ResponseBody String countryCodeState(HttpServletRequest req, HttpServletResponse resp)
 	{
 		String key=(String) req.getSession().getAttribute("key");
 		if(key!=null)
 		{
 			String countryCode=req.getParameter("countryCode").toUpperCase();
-			String state=WordUtils.capitalizeFully(req.getParameter("state"));
+			String stateCode=req.getParameter("stateCode").toUpperCase();
 			JSONObject placeJson=new JSONObject();
-			placeJson.put("state", state);
+			placeJson.put("stateCode", stateCode);
 			placeJson.put("countryCode", countryCode);
 			JSONObject requestJson=new JSONObject();
 			requestJson.put("place", placeJson);
 			requestJson.put("key", key);
-			return timezoneAction(req, requestJson.toJSONString());
+			return timezoneAction(req, resp, requestJson.toJSONString());
 		}
 		else
 		{
+			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return "please login..";
 		}
 	}
@@ -113,10 +118,11 @@ public class TimezoneController
 			JSONObject requestJson=new JSONObject();
 			requestJson.put("place", placeJson);
 			requestJson.put("key", key);
-			return timezoneAction(req, requestJson.toJSONString());
+			return timezoneAction(req, resp, requestJson.toJSONString());
 		}
 		else
 		{
+			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return "please login..";
 		}
 	}
@@ -142,10 +148,11 @@ public class TimezoneController
 			JSONObject requestJson=new JSONObject();
 			requestJson.put("place", placeJson);
 			requestJson.put("key", key);
-			return timezoneAction(req, requestJson.toJSONString());
+			return timezoneAction(req, resp, requestJson.toJSONString());
 		}
 		else
 		{
+			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return "please login..";
 		}
 	}
@@ -166,7 +173,7 @@ public class TimezoneController
 	 * This method will retrieve timezonejson data and give response as timezone data in json format.
 	 */
 	@RequestMapping(value="/timezone", method=RequestMethod.POST)
-	public @ResponseBody String timezoneAction( HttpServletRequest req,@RequestBody String timezonejson) 
+	public @ResponseBody String timezoneAction( HttpServletRequest req,HttpServletResponse resp,@RequestBody String timezonejson) 
 	{
 		JSONObject timezoneJsonObject=null;
 		try
@@ -176,6 +183,7 @@ public class TimezoneController
 			String key=null;
 			String city=null;
 			String state=null;
+			String stateCode=null;
 			String country=null;
 			String countryCode=null;
 			String zipCode=null;
@@ -254,6 +262,16 @@ public class TimezoneController
 				}
 				try
 				{
+					stateCode=place.get("stateCode").toString();
+					logger.info("stateCode="+stateCode);
+				}
+				catch(Exception e)
+				{
+					logger.warning("State code name is null");
+					stateCode=null;
+				}
+				try
+				{
 					country=place.get("country").toString();
 					logger.info("country="+country);
 				}
@@ -266,9 +284,18 @@ public class TimezoneController
 				try
 				{
 					Timezone timezone=new Timezone();
-					tomezonejson=timezone.getTimezoneData(key, city, state, country, countryCode, zipCode, latitude, longitude);
+					tomezonejson=timezone.getTimezoneData(key, city, state,stateCode, country, countryCode, zipCode, latitude, longitude);
 					logger.info("timezone data:  "+tomezonejson.toJSONString());
-					return tomezonejson.toJSONString();
+					if(tomezonejson.get("status").toString().equals("success"))
+					{
+						return tomezonejson.toJSONString();
+					}
+					else
+					{
+						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+						return tomezonejson.toJSONString();
+						
+					}
 				}
 				catch(Exception e)
 				{
@@ -307,10 +334,11 @@ public class TimezoneController
 	 * this is temporary url.
 	 */
 	@RequestMapping("/uploaddata")
-	public void uploadTimezoneData(HttpServletRequest req, HttpServletResponse resp)
+	public String uploadTimezoneData(HttpServletRequest req, HttpServletResponse resp)
 	{
-		UploadData uploadData=new UploadData();
-		uploadData.uploadTime();
+		Queue queue = QueueFactory.getQueue("subscription-queue");
+		queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "upload"));
+		return "login";	
 	}
 	/**
 	 * 
@@ -404,7 +432,7 @@ public class TimezoneController
 			{
 				try{
 					listRequiredJson =(JSONObject) listRequiredJson.get("data");
-					responseJson=(JSONObject) jsonParser.parse(timezoneAction(req,listRequiredJson.toJSONString()));
+					responseJson=(JSONObject) jsonParser.parse(timezoneAction(req,null, listRequiredJson.toJSONString()));
 					Calendar cal=Calendar.getInstance();
 					responseJson.put("currentTime", cal.getTimeInMillis());
 					return responseJson.toJSONString();
@@ -465,6 +493,10 @@ public class TimezoneController
 		else if(req.getParameter("list").equals("cityData")){
 			SearchByCity searchByCity=new SearchByCity();
 			searchByCity.getCityJson(limit, cursorString, req.getParameter("keyString"));
+		}
+		else if(req.getParameter("list").equals("upload")){
+			UploadData uploadData=new UploadData();
+			uploadData.uploadTime();
 		}
 		
 	}
@@ -528,7 +560,7 @@ public class TimezoneController
 	 * @return
 	 */
 	@RequestMapping(value="/timezonebycity" ,method=RequestMethod.POST)
-	public @ResponseBody String getTimezoneByCity(@RequestBody String searchData)
+	public @ResponseBody String getTimezoneByCity(HttpServletResponse resp,@RequestBody String searchData)
 	{
 		JSONArray responseArray=new JSONArray();
 		try 
@@ -563,6 +595,10 @@ public class TimezoneController
 						continue;
 					}
 				}
+				if(responseArray.size()==0)
+				{
+					resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				}
 				return responseArray.toJSONString();
 			}
 			else
@@ -580,19 +616,14 @@ public class TimezoneController
 		}
 	}
 	
-	@RequestMapping(value="/dailyMemcacheClearance")
-	public void dailyMemcacheClearance(){
+	@RequestMapping(value="/monthlyMemcacheClearance")
+	public @ResponseBody String monthlyMemcacheClearance(){
 		MCacheService.removeAll();
-		DataListProvider dataListProvider=new DataListProvider();;
-		TimezoneListProvider listprovider=new TimezoneListProvider();
-		LongLatDataProvider longLatDataProvider=new LongLatDataProvider();
-		SearchByCity searchByCity=new SearchByCity();
-		int limit=1000;
-		String cursorString=null;
-		
-		dataListProvider.getCountryList(limit, cursorString);
-		listprovider.getTimezoneConvertorData(limit, cursorString);
-		longLatDataProvider.getlongitudeList(limit, cursorString);
-		searchByCity.getCityJson(limit, cursorString, "getCityData1");
+		Queue queue = QueueFactory.getQueue("subscription-queue");
+		queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "country"));
+		queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "converterData"));
+		queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "longAndLat"));
+		queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "cityData"));
+		return "success";
 	}
 }
