@@ -1,4 +1,17 @@
 $(document).ready(function(){
+	function placeDetail(city, state,country)
+	{
+		var output='<div class="form-group"><label class="col-sm-3 control-label">Your Current City:</label><div class="col-sm-9">';
+			output+='<p class="form-control-static" id=city>'+city+'</p></div></div>';
+			output+='<div class="form-group"><label class="col-sm-3 control-label">Your Current State:</label><div class="col-sm-9">';
+			output+='<p class="form-control-static" id=state>'+state+'</p></div></div>';
+			output+='<div class="form-group"><label class="col-sm-3 control-label">Your Current Country:</label><div class="col-sm-9">';
+			output+='<p class="form-control-static" id=country>'+country+'</p></div></div>';    
+			output+='<div class="form-group"><label class="col-sm-3 control-label">Your Current Time:</label><div class="col-sm-9">';
+			output+='<p class="form-control-static" id=time></p></div></div>';
+			console.log(output);
+			$('#place').html(output);
+	}
 	$('#logout').click(function(event){
 		var leave=confirm("Do you want to logout?");
 		if(leave){
@@ -34,17 +47,14 @@ $(document).ready(function(){
 				timezonedata=timezonedata.data
 				if(longitude==sessionStorage.longitude&&latitude==sessionStorage.latitude)
 					{
-					$('#city').removeClass('loading');
-					$('#city').html(timezonedata[0].city+" ("+distance+")");
-					$('#state').removeClass('loading');
-					$('#state').html(timezonedata[0].state);
+					var time;
 					$.get( "/getUTCTime", function(time){
 						var localTime=new Date();
 			 			serverTime=time;
 			 			var rawOffset=serverTime-localTime.getTime()+timezonedata[0].rawOffset;
-			 			$('#country').removeClass('loading');
-						$('#time').removeClass('loading');
-			 			$('#country').html(timezonedata[0].country+'<script type="text/javascript">window.onload = getClock('+rawOffset+',"#time" );</script>');
+			 			time='<script type="text/javascript">window.onload = getClock('+rawOffset+',"#time" );</script>';
+			 			$('#place').removeClass('loading');
+						placeDetail(timezonedata[0].city,timezonedata[0].state,timezonedata[0].country+time);
 				    });
 					}
 				else
@@ -67,10 +77,7 @@ $(document).ready(function(){
 	}
 	function getLocation(longitude, latitude){
 		
-		$('#city').addClass('loading');
-			$('#state').addClass('loading');
-			$('#country').addClass('loading');
-			$('#time').addClass('loading');
+		$('#place').addClass('loading');
 			dataString="longitude="+longitude+"&latitude="+latitude;
 			$.ajax({
 				url: "timezone",
@@ -85,28 +92,20 @@ $(document).ready(function(){
 						responseData=data;
 						var distance=responseData.distance;
 						timezonedata=responseData.data
-						 $('#city').removeClass('loading');
-						$('#city').html(timezonedata[0].city+" ("+distance+")");
-						$('#state').removeClass('loading');
-						$('#state').html(timezonedata[0].state);
 						$.get( "/getUTCTime", function(time){
 							var localTime=new Date();
 				 			serverTime=time;
 				 			var rawOffset=serverTime-localTime.getTime()+timezonedata[0].rawOffset;
-				 			$('#country').removeClass('loading');
-							$('#time').removeClass('loading');
-				 			$('#country').html(timezonedata[0].country+'<script type="text/javascript">window.onload = getClock('+rawOffset+',"#time" );</script>');
+				 			var time='<script type="text/javascript">window.onload = getClock('+rawOffset+',"#time" );</script>';
+							$('#place').removeClass('loading');
+							placeDetail(timezonedata[0].city,timezonedata[0].state,timezonedata[0].country+time);
 				 			if(typeof(Storage)!=="undefined"){
 				 				sessionStorage.data=JSON.stringify(responseData);
 					 			sessionStorage.longitude=longitude;
 					 			sessionStorage.latitude=latitude;
 				 			}
-				 			
 						});
-		 		
 				  	}
-			
 				});
 		}
-	
 });

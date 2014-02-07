@@ -6,9 +6,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Admin-Timezone</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <%if(session.getAttribute("key")==null){
-		response.sendRedirect("/login.html");
-	}%> 
 	<!--- CSS --->
 	 <link href="css/bootstrap.min.css" rel="stylesheet">
 	 <!-- Java Script -->
@@ -22,19 +19,21 @@
 		    document.getElementById(id).innerHTML = date;
 		    setTimeout('date_time("'+id+'",'+offset+');','1000');
 		 }
+     $(document).ready(function(){
+    	 <%
+    	 response.setHeader("Cache-Control", "no-cache");
+    	 response.setHeader("Cache-Control", "no-store");
+    	 response.setDateHeader("Expires", 0);
+    	 response.setHeader("Pragma", "no-cache");
+    	 if (session.getAttribute("key") == null ) {
+    	  response.sendRedirect("/login");
+    	 }
+    	%> 
+     });
      </script>
     
 </head>
 <body>
-	<%
-	 response.setHeader("Cache-Control", "no-cache");
-	 response.setHeader("Cache-Control", "no-store");
-	 response.setDateHeader("Expires", 0);
-	 response.setHeader("Pragma", "no-cache");
-	 if (session.getAttribute("key") == null ) {
-	  response.sendRedirect("/login");
-	 }
-	%>
 	<jsp:include page="header.jsp"></jsp:include>
 		<div class="container" >
 			<h1>Please Select Country, State and City to get time of particular place.</h1>

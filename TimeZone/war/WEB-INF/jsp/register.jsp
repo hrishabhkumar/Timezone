@@ -4,6 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <script src="jsfile/jquery-1.9.1.js"></script>
 <script src="js/bootstrap.min.js"></script>
@@ -14,6 +15,15 @@ $(document).ready(function(){
     if (!$('#register').hasClass('active')) {
 		$('#register').addClass('active');
 	}
+    <%
+	 response.setHeader("Cache-Control", "no-cache");
+	 response.setHeader("Cache-Control", "no-store");
+	 response.setDateHeader("Expires", 0);
+	 response.setHeader("Pragma", "no-cache");
+	 if (session.getAttribute("key") != null ) {
+	  response.sendRedirect("/home.html");
+	 }
+	%>
     });
 </script>
 <style >

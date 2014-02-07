@@ -52,10 +52,11 @@ public class DataListProvider {
 				if (!results.isEmpty()) {
 					Collection<String> country=new TreeSet<String>();
 					for (TimezoneJDO timeZone: results) {
-						country.add(timeZone.getCountry()+","+timeZone.getCountryCode());
+						country.add(timeZone.getCountry()+"&"+timeZone.getCountryCode());
 					}
-					if(MCacheService.get(keyString)!=null){
-					country.addAll((TreeSet<String>) MCacheService.get(keyString));
+					if(MCacheService.get(keyString)!=null)
+					{
+						country.addAll((TreeSet<String>) MCacheService.get(keyString));
 					}
 					MCacheService.set(keyString, country);
 					if(results.size()==limit){
@@ -67,9 +68,9 @@ public class DataListProvider {
 						JSONArray countryJsonArray=new JSONArray();
 						for(String countryNameandCode: countrySet){
 							JSONObject countryData=new JSONObject();
-							countryData.put("country", countryNameandCode.substring(0, countryNameandCode.indexOf(",")));
-							countryData.put("countryCode", countryNameandCode.substring(countryNameandCode.indexOf(",")+1));
-							countryData.put("label", countryNameandCode.substring(countryNameandCode.indexOf(",")+1)+" "+countryNameandCode.substring(0, countryNameandCode.indexOf(",")));
+							countryData.put("country", countryNameandCode.substring(0, countryNameandCode.indexOf("&")));
+							countryData.put("countryCode", countryNameandCode.substring(countryNameandCode.indexOf("&")+1));
+							countryData.put("label", countryNameandCode.substring(countryNameandCode.indexOf("&")+1)+" "+countryNameandCode.substring(0, countryNameandCode.indexOf("&")));
 							countryJsonArray.add(countryData);
 						}
 						logger.log(Level.INFO,"Updating Memcache with country List");
@@ -125,7 +126,8 @@ public class DataListProvider {
 			  MCacheService.set(keyString, state);
 			  if(results.size()==limit)
 			  {
-				getStateList(country, limit, cursor.toWebSafeString());
+				  Queue queue = QueueFactory.getQueue("subscription-queue");
+				  queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("cursorString", cursorString).param("list", "state").param("country", country));
 				
 			  }
 			  else{

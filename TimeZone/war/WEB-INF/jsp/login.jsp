@@ -11,59 +11,82 @@
 <script src="jsfile/jquery-1.9.1.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="jsfile/script.js"></script>
-<script>$(document).ready(function(){if(!$('#login').hasClass('active')){$('#login').addClass('active');}});</script>
+<script>
+$(document).ready(function(){
+	if(!$('#login').hasClass('active'))
+	{
+		$('#login').addClass('active');
+		}
+	<%
+	 response.setHeader("Cache-Control", "no-cache");
+	 response.setHeader("Cache-Control", "no-store");
+	 response.setDateHeader("Expires", 0);
+	 response.setHeader("Pragma", "no-cache");
+	 if (session.getAttribute("key") != null ) {
+	  response.sendRedirect("/home.html");
+	 }
+	%>
+	});
+	</script>
 <style>
-.loader
+	.loader
+	{
+		position:fixed;
+		left:0px;
+		top:0px;
+		width:100%;
+		height:100%;
+		z-index:9999;
+		background:transparent url('img/page-loader.gif') 50% 50% no-repeat ;
+	}
+.failed
 {
-position:fixed;
-left:0px;
-top:0px;
-width:100%;
-height:100%;
-z-index:9999;
-background:transparent url('img/page-loader.gif') 50% 50% no-repeat ;
+		color:red;
 }
-.failed{color:red;}
-.success{color:green;}</style>
+.success
+{
+	color:green;
+}
+</style>
 </head>
 <body>
-<jsp:include page="header.jsp"></jsp:include>
-<div class=container id=container>
-<div class=col-sm-offset-4>
-<div class=header>
-<span style="color: red"></span>
-<span style="color: green"></span>
-<h1>Sign In</h1>
-</div>
-If you are already registered please enter:
-<form action="#" class="form-horizontal " role=form id=loginForm>
-<span id=loginStatus></span>
-<div class=form-group>
-<div class=col-sm-4>
-<label for=username>User Name:</label>
-<input placeholder=Email class=form-control name=userid id=userid>
-<span id=useridSpan class=help-block></span>
-</div>
-</div>
-<div class=form-group>
-<div class=col-sm-4>
-<label for=password>Password:</label>
-<input type=password placeholder=Password class=form-control name=password id=password>
-<span id=passwordSpan class=help-block></span>
-</div>
-</div>
-<div class=form-group>
-<div class="col-sm-4 ">
-<button type=submit class="btn btn-success">Sign in</button>
-<button type=reset class="btn btn-default">Reset</button>
-</div>
-</div>
-</form>
-<div class=form-group>
-<p class=help-block><a href="/recover/initiate">Forgot your password?</a></p>
-</div>
-</div>
-</div>
- <jsp:include page="footer.jsp"></jsp:include>
+	<jsp:include page="header.jsp"></jsp:include>
+	<div class=container id=container>
+		<div class=col-sm-offset-4>
+			<div class=header>
+				<span style="color: red"></span>
+				<span style="color: green"></span>
+				<h1>Sign In</h1>
+			</div>
+			If you are already registered please enter:
+			<form action="#" class="form-horizontal " role=form id=loginForm>
+				<span id=loginStatus></span>
+				<div class=form-group>
+					<div class=col-sm-4>
+						<label for=username>User Name:</label>
+						<input placeholder=Email class=form-control name=userid id=userid>
+						<span id=useridSpan class=help-block></span>
+					</div>
+				</div>
+				<div class=form-group>
+					<div class=col-sm-4>
+						<label for=password>Password:</label>
+						<input type=password placeholder=Password class=form-control name=password id=password>
+						<span id=passwordSpan class=help-block></span>
+					</div>
+				</div>
+				<div class=form-group>
+					<div class="col-sm-4 ">
+						<button type=submit class="btn btn-success">Sign in</button>
+						<button type=reset class="btn btn-default">Reset</button>
+					</div>
+				</div>
+			</form>
+			<div class=form-group>
+				<p class=help-block><a href="/recover/initiate">Forgot your password?</a></p>
+			</div>
+		</div>
+	</div>
+	 <jsp:include page="footer.jsp"></jsp:include>
 </body>
 </html>

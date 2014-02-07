@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -37,20 +36,14 @@ public class LongLatDataProvider
 	 * @return longitude and Latitude list along with zipCode
 	 */
 	@SuppressWarnings("unchecked")
-  	public Map<String, String> getlongitudeList(int limit, String cursorString) 
+  	public Map<String, String> getlongitudeList(int limit, String cursorString, String keyString) 
   	{
 		Map<String, String> longAndLatMap=null;
   		logger.info("inside timezone id list "+limit);
   		Query query=null;
   		PersistenceManager pm = PMF.getPMF().getPersistenceManager();
   		logger.info("inside getLongAndtLat "+limit);
-  		String keyString="getLongAndtLat1";
-  		if(MCacheService.containsKey("getLongAndtLat"))
-  		{
-  			return (Map<String, String>) MCacheService.get("getLongAndtLat");
-  		}
-  		else
-  		{
+  		
   			try
   			{
 	  			query=pm.newQuery(TimezoneJDO.class);
@@ -77,21 +70,24 @@ public class LongLatDataProvider
 	  				
 	  				if(MCacheService.containsKey(keyString))
 	  				{
-	  					longAndLatMap.putAll( (Map<String, String>) MCacheService.get(keyString));
+	  					Map<String, String> memecacheData= (Map<String, String>) MCacheService.get(keyString);
+	  					if(memecacheData.size()<30000)
+	  					{
+	  						longAndLatMap.putAll( (Map<String, String>) MCacheService.get(keyString));
+	  					}
+	  					else
+	  					{
+	  						int i=Integer.parseInt(keyString.substring(keyString.length()-1));
+	  						i++;
+	  						keyString=keyString.substring(0,keyString.length()-1)+i;
+	  					}
 	  				}
 	  				MCacheService.set(keyString, longAndLatMap);
 	  				if(results.size()==limit)
 	  				{
 	  					Queue queue = QueueFactory.getQueue("subscription-queue");
-	  					queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("cursorString", cursorString).param("list", "longAndLat"));
+	  					queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("cursorString", cursorString).param("list", "longAndLat").param("keyString", keyString));
 	  					
-	  				}
-	  				else
-	  				{
-	  					longAndLatMap= (Map<String, String>) MCacheService.get(keyString);
-	  					logger.log(Level.INFO,"Updating Memcache with LongAndtLat List2");
-	  					MCacheService.set("getLongAndtLat", longAndLatMap );
-	  					MCacheService.remove(keyString);
 	  				}
 	  				return longAndLatMap;
 	  			}
@@ -111,17 +107,37 @@ public class LongLatDataProvider
   				query.closeAll();
   			}
   		}
-  	}
+  	
   	/**
   	 * 
   	 * @param latpoint
   	 * @param longpoint
   	 * @return zipcode along with distance(in KM)
   	 */
-  	public Map<String, String> getNearestZip(double latpoint, double longpoint)
+  	@SuppressWarnings("unchecked")
+	public Map<String, String> getNearestZip(double latpoint, double longpoint)
   	{
   		Map<String, String> nearestZip=null;
-		Map<String, String> longAndLatMap= getlongitudeList(1000, null);
+  		Map<String, String> longAndLatMap=null;
+  		if(MCacheService.containsKey("getLongAndtLat1"))
+  		{
+  			longAndLatMap=new HashMap<String, String>();		
+  			for(int i=1;i<=10;i++)
+			{
+				if(MCacheService.containsKey("getLongAndtLat"+i))
+				{
+					longAndLatMap.putAll((Map<? extends String, ? extends String>) MCacheService.get("getLongAndtLat"+i));
+				}
+				else
+				{
+					break;
+				}
+			}
+  		}
+  		else
+  		{
+  			longAndLatMap= getlongitudeList(1000, null, "getLongAndtLat1");
+  		}
   		Map<Double, String> distanceWithZip=new TreeMap<Double, String>();
   		logger.info("returned from getlongitudeList "+longAndLatMap.size());
   		Set<String> keySet= longAndLatMap.keySet();

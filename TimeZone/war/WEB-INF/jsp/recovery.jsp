@@ -3,9 +3,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<%if(session.getAttribute("key")!=null){
-		response.sendRedirect("/home.html");
-	}%> 
 <title>Recover Password</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +11,19 @@
 	<script src="../jsfile/jquery-1.9.1.js"></script>
      <script src="../js/bootstrap.min.js"></script>
      <script src="../jsfile/recovery.js"></script>
+     <script type="text/javascript">
+     	$(document).ready(function(){
+     		<%
+     		 response.setHeader("Cache-Control", "no-cache");
+     		 response.setHeader("Cache-Control", "no-store");
+     		 response.setDateHeader("Expires", 0);
+     		 response.setHeader("Pragma", "no-cache");
+     		 if (session.getAttribute("key") != null ) {
+     		  response.sendRedirect("/home.html");
+     		 }
+     		%>
+     	});
+     </script>
 </head>
 <body>
 	<jsp:include page="header.jsp"></jsp:include>

@@ -1,6 +1,8 @@
 package com.adaptavant.controller;
 
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,12 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.adaptavant.timezone.converter.TimezoneListProvider;
 import com.adaptavant.timezone.services.DataListProvider;
 import com.adaptavant.timezone.services.LongLatDataProvider;
 import com.adaptavant.timezone.services.SearchByCity;
 import com.adaptavant.timezone.services.Timezone;
-import com.adaptavant.timezone.services.uploaddata.UploadData;
+import com.adaptavant.timezone.services.uploaddata.UploadDataTimeZoneData;
 import com.adaptavant.utilities.MCacheService;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
@@ -284,7 +285,7 @@ public class TimezoneController
 				try
 				{
 					Timezone timezone=new Timezone();
-					tomezonejson=timezone.getTimezoneData(key, city, state,stateCode, country, countryCode, zipCode, latitude, longitude);
+					tomezonejson=timezone.getTimezoneData(key,city, state,stateCode, country, countryCode, zipCode, latitude, longitude);
 					logger.info("timezone data:  "+tomezonejson.toJSONString());
 					if(tomezonejson.get("status").toString().equals("success"))
 					{
@@ -303,6 +304,7 @@ public class TimezoneController
 					logger.warning(e.getMessage());
 					tomezonejson.put("data", "data is not in proper format");
 					tomezonejson.put("status", "failed");
+					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					return tomezonejson.toJSONString();
 				}
 //			}
@@ -323,6 +325,7 @@ public class TimezoneController
 			String format="{\"key\": \"userKey\",\"place\":{\"country\":\"countryName\",\"state\":\"stateName\",\"city\":\"cityName\"}||{\"country\":\"countryName\",\"state\":\"stateName\"}||{\"countryCode\":\"countryCode\",\"state\":\"stateName\"}||{\"zipCode\":\"ZipCode\"}||{\"longitude\":\"longitude\",\"latitude\":\"latitude\"}}";
 			timezoneJson.put("format", format);
 			timezoneJson.put("status", "failed");
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return timezoneJson.toJSONString();
 		}
 		
@@ -333,13 +336,14 @@ public class TimezoneController
 	 * @param resp
 	 * this is temporary url.
 	 */
-	@RequestMapping("/uploaddata")
+	@RequestMapping("/uploadtimezonedata")
 	public String uploadTimezoneData(HttpServletRequest req, HttpServletResponse resp)
 	{
 		Queue queue = QueueFactory.getQueue("subscription-queue");
-		queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "upload"));
+		queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "uploadtimezonedata"));
 		return "login";	
 	}
+	
 	/**
 	 * 
 	 * @param req
@@ -371,6 +375,23 @@ public class TimezoneController
 					responseJson.put("status", "success");
 					return responseJson.toJSONString();
 				}
+				else if(MCacheService.containsKey("CountryList"))
+				{
+					Collection<String> countrySet=(TreeSet<String>) MCacheService.get("CountryList");
+					JSONArray countryJsonArray=new JSONArray();
+					for(String countryNameandCode: countrySet)
+					{
+						JSONObject countryData=new JSONObject();
+						countryData.put("country", countryNameandCode.substring(0, countryNameandCode.indexOf("&")));
+						countryData.put("countryCode", countryNameandCode.substring(countryNameandCode.indexOf("&")+1));
+						countryData.put("label", countryNameandCode.substring(countryNameandCode.indexOf("&")+1)+" "+countryNameandCode.substring(0, countryNameandCode.indexOf("&")));
+						countryJsonArray.add(countryData);
+					}
+					responseJson=new JSONObject();
+					responseJson.put("list", countryJsonArray);
+					responseJson.put("status", "success");
+					return responseJson.toJSONString();
+				}
 				else
 				{
 					if(!MCacheService.containsKey("CountryList"))
@@ -393,6 +414,16 @@ public class TimezoneController
 					System.out.println(stateListJsonArray);
 					responseJson=new JSONObject();
 					responseJson.put("list", stateListJsonArray);
+					responseJson.put("status", "success");
+					return responseJson.toJSONString();
+				}
+				else if(MCacheService.containsKey("getStateList1"+country))
+				{
+					Collection<String> stateSet=(TreeSet<String>) MCacheService.get("getStateList1"+country);
+					JSONArray stateJsonArray=new JSONArray();
+					stateJsonArray.addAll(stateSet);
+					responseJson=new JSONObject();
+					responseJson.put("list", stateJsonArray);
 					responseJson.put("status", "success");
 					return responseJson.toJSONString();
 				}
@@ -469,7 +500,6 @@ public class TimezoneController
 	public void getlist(HttpServletRequest req, HttpServletResponse resp)
 	{
 		DataListProvider dataListProvider=null;
-		TimezoneListProvider listprovider=null;
 		LongLatDataProvider longLatDataProvider=null;
 		int limit=Integer.parseInt(req.getParameter("limit"));
 		String cursorString=req.getParameter("cursorString");
@@ -480,25 +510,24 @@ public class TimezoneController
 			 dataListProvider=new DataListProvider();
 			dataListProvider.getCountryList(limit, cursorString);
 		}
-		else if(req.getParameter("list").equals("converterData"))
+		else if(req.getParameter("list").equals("state"))
 		{
-			listprovider=new TimezoneListProvider();
-			listprovider.getTimezoneConvertorData(limit, cursorString);
+			 dataListProvider=new DataListProvider();
+			 dataListProvider.getStateList(req.getParameter("country"), limit, cursorString);
 		}
 		else if(req.getParameter("list").equals("longAndLat"))
 		{
 			longLatDataProvider=new LongLatDataProvider();
-			longLatDataProvider.getlongitudeList(limit, cursorString);
+			longLatDataProvider.getlongitudeList(limit, cursorString, req.getParameter("keyString"));
 		}
 		else if(req.getParameter("list").equals("cityData")){
 			SearchByCity searchByCity=new SearchByCity();
 			searchByCity.getCityJson(limit, cursorString, req.getParameter("keyString"));
 		}
-		else if(req.getParameter("list").equals("upload")){
-			UploadData uploadData=new UploadData();
-			uploadData.uploadTime();
+		else if(req.getParameter("list").equals("uploadtimezonedata")){
+			UploadDataTimeZoneData uploadData=new UploadDataTimeZoneData();
+			uploadData.uploadTimeZoneData();
 		}
-		
 	}
 	/**
 	 * 
@@ -509,40 +538,7 @@ public class TimezoneController
 	{
 		return "timezoneConverter";
 	}
-	@RequestMapping(value="/converter",method=RequestMethod.POST )
-	public @ResponseBody String converter(@RequestBody String reqired)
-	{
-		logger.info(reqired);
-		try 
-		{
-			JSONObject requirment=(JSONObject) jsonParser.parse(reqired);
-			if(requirment.get("required").toString().equals("timezonenames"))
-			{
-				
-				TimezoneListProvider timezoneListProvider=new TimezoneListProvider();
-				responseJson = timezoneListProvider.getTimezoneConvertorData(1000, null);
-				if(responseJson!=null)
-				{
-					return responseJson.toJSONString();
-				}
-				else
-				{
-					return null;
-				}
-			}
-			else
-			{
-				logger.info("required field not matched");
-				return null;
-			}
-		} 
-		catch (ParseException e) 
-		{
-			logger.info(e.getMessage());
-			return null;
-		}
-		
-	}
+	
 	/**
 	 * 
 	 * @return current server time.
@@ -566,10 +562,12 @@ public class TimezoneController
 		try 
 		{
 			JSONObject termJSon=(JSONObject) jsonParser.parse(searchData);
+			logger.info(termJSon.get("term").toString());
+			String searchKey=termJSon.get("term").toString().replace("\\", "");
+			JSONArray memcacheData=new JSONArray();
 			if(MCacheService.containsKey("getCityData1"))
 			{
 				logger.info("inside memcache of getTimezoneByCity");
-				JSONArray memcacheData=new JSONArray();
 				for(int i=1;i<=10;i++)
 				{
 					if(MCacheService.containsKey("getCityData"+i))
@@ -581,24 +579,23 @@ public class TimezoneController
 						break;
 					}
 				}
-				logger.info(termJSon.get("term").toString());
-				String searchKey=termJSon.get("term").toString().replace("\\", "");				
-				for(Object cityData: memcacheData)
+			for(int i=0;i<memcacheData.size();i++)
+			{
+				JSONObject cityData=(JSONObject) memcacheData.get(i);
+				if(cityData.get("label").toString().toLowerCase().contains(searchKey.toLowerCase()))
 				{
-					JSONObject data=(JSONObject) cityData;
-					if(data.get("label").toString().toLowerCase().contains(searchKey.toLowerCase()))
+					responseArray.add(cityData);
+					if(responseArray.size()>=500)
 					{
-						responseArray.add(data);
-					}
-					else
-					{
-						continue;
+						break;
 					}
 				}
+			}
 				if(responseArray.size()==0)
 				{
 					resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				}
+				
 				return responseArray.toJSONString();
 			}
 			else

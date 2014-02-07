@@ -12,18 +12,21 @@
 	<script src="jsfile/jquery-1.9.1.js"></script>
      <script src="js/bootstrap.min.js"></script>
      <script src="jsfile/changePassword.js"></script>
-     
+     <script type="text/javascript">
+     	$(document).ready(function(){
+     		<%
+     		 response.setHeader("Cache-Control", "no-cache");
+     		 response.setHeader("Cache-Control", "no-store");
+     		 response.setDateHeader("Expires", 0);
+     		 response.setHeader("Pragma", "no-cache");
+     		 if(session.getAttribute("recover")==null){
+     			 response.sendRedirect("/login");
+     		 }
+     		%>
+     	});
+     </script>
 </head>
 <body>
-	<%
-	 response.setHeader("Cache-Control", "no-cache");
-	 response.setHeader("Cache-Control", "no-store");
-	 response.setDateHeader("Expires", 0);
-	 response.setHeader("Pragma", "no-cache");
-	 if(session.getAttribute("recover")==null){
-		 response.sendRedirect("/login");
-	 }
-	%>
 	<jsp:include page="header.jsp"></jsp:include>
 	<div class="container">
 		<div class="header">

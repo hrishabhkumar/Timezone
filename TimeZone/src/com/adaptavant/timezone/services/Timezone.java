@@ -35,17 +35,18 @@ public class Timezone
 	 * @param zipCode
 	 * @param latitude
 	 * @param longitude
+	 * @param longitude2 
 	 * @return Timezone data as JSON String.
 	 */
 	@SuppressWarnings("unchecked")
-	public JSONObject getTimezoneData(String key, String city, String state,String stateCode, String country, String countryCode, String zipCode, String latitude, String longitude)
+	public JSONObject getTimezoneData(String key,String city, String state,String stateCode, String country, String countryCode, String zipCode, String latitude, String longitude)
 	{
 		JSONObject reponseJson=null;
 		String distance=null;
 		PersistenceManager pm = PMF.getPMF().getPersistenceManager();
 		logger.info("Key:" +key);
 		CustomerJDO customer= pm.getObjectById(CustomerJDO.class, key);
-		String keyString="getTimeZoneDataOf"+"city="+city+"state="+state+"country="+country+"countrycode="+countryCode+"latitude="+latitude+"longitude="+longitude+"zipcode="+zipCode;
+		String keyString="getTimeZoneDataOf"+"city="+city+"state="+state+"stateCode="+stateCode+"country="+country+"countrycode="+countryCode+"latitude="+latitude+"longitude="+longitude+"zipcode="+zipCode;
 		if(MCacheService.get(keyString)!=null)
 		{
 			int requests=customer.getRequests();
@@ -111,6 +112,12 @@ public class Timezone
 		                	"zipCode == '" +zip+"'");
 					query.setRange(0,1);
 					
+				}
+				else{
+					reponseJson=new JSONObject();
+					reponseJson.put("data",null);
+					reponseJson.put("status", "notFound");
+					return reponseJson;
 				}
 				logger.info(query.toString());
 			}

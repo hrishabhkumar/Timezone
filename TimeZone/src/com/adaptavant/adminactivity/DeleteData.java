@@ -42,8 +42,7 @@ public class DeleteData {
 		  if (!results.isEmpty()){
 			TimezoneJDO timeZoneJDO=results.get(0);
 			pm.deletePersistent(timeZoneJDO);
-			MCacheService.remove("getTimeZoneDataOf"+city+state+country);
-			MCacheService.remove("getTimeZoneDataOf"+city+state+country);
+			MCacheService.removeAll();
 			return "success";
 		 }
 		 else{

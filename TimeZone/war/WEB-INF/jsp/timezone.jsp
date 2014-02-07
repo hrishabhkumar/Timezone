@@ -32,9 +32,7 @@
         .ui-autocomplete-loading {
     		background: white url('img/loader.gif') right center no-repeat;
   		 }
-  		 .ui-helper-hidden {
-		display: block;
-		}
+  		
 		.loader
 		{
 			position:fixed;
@@ -56,20 +54,21 @@
 				 setTimeout('date_time("'+id+'",'+offset+');','1000'); 
 			 }
 		 }
+     $(document).ready(function(){
+    	 <%
+    	 response.setHeader("Cache-Control", "no-cache");
+    	 response.setHeader("Cache-Control", "no-store");
+    	 response.setDateHeader("Expires", 0);
+    	 response.setHeader("Pragma", "no-cache");
+    	 if (session.getAttribute("key") == null ) 
+    	 {
+    		response.sendRedirect("/login.html");
+    	 }
+    	%> 
+     });
      </script>
 </head>
 <body>
-	<%
-	 response.setHeader("Cache-Control", "no-cache");
-	 response.setHeader("Cache-Control", "no-store");
-	 response.setDateHeader("Expires", 0);
-	 response.setHeader("Pragma", "no-cache");
-	 if (session.getAttribute("key") == null ) 
-	 {
-		response.sendRedirect("/login");
-	 }
-	%>
-	
 	<jsp:include page="header.jsp"></jsp:include>
 		<div class="container" >
 		<ul class="nav nav-tabs" id="myTab">
@@ -115,7 +114,7 @@
 					<div class='row' id='zipDiv'>
 						<div class='col-sm-4'>
 							<label for='zip '>Zip:</label>
-		  						<input class="form-control" id='zip' placeholder='Zip' >
+		  						<input class="form-control" id='zip' placeholder='Zip' autocomplete="off">
 							<span id="zipSpan" class='help-block'></span>
 						</div>
 					</div>
@@ -197,7 +196,6 @@
 	    			</div>
 	    		</div>
 	    	</div>
-	    	
 	    </div>
     </div>
 		

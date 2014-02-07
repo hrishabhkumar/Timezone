@@ -9,80 +9,97 @@ $(document).ready(function(){
 			event.preventDefault();
 		}
 	});
-	$(function() {
-		var datalist;
-		var dataString={
-				required: "timezonenames"
-				};
-		dataString=JSON.stringify(dataString);
-		console.log(dataString) ;
-		$.ajax({
-			url: "converter",
-			type: "post",
-			dataType: "json",
-			contentType: "application/json",
-			data: dataString,
-			async: false,
-			cache: false,
-			processData:false,
-			success: function(data){
-				datalist=data.list;
-				console.log(data)
-		      },
-		    error: function(data){
-		    }
-		});
+	var zip;
 		$( "#timezone1" ).autocomplete({
-			minLength: 2,
-			source:datalist,
-			focus: function( event, ui ) {
-				$( "#timezone1" ).val( ui.item.label );
-				$( "#timezone1-offset" ).val( ui.item.value);
-				return false;
+			minLength: 3,
+			source:function (request, response) {
+				zip=null;
+	            var dataString={
+	            	term: $.ui.autocomplete.escapeRegex(request.term)
+	            };
+	            dataString=JSON.stringify(dataString);
+	            console.log($.ui.autocomplete.escapeRegex(request.term));
+	            $.ajax({
+					url: "timezonebycity",
+					type: "post",
+					dataType: "json",
+					contentType: "application/json",
+					data: dataString,
+					async: true,
+					cache: true,
+					processData:false,
+					success: function(data){
+						$('#timezone1Span').empty();
+						$('#timezone1').removeClass("ui-autocomplete-loading");
+						var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+				          response( $.grep( data, function( item ){
+				              return (matcher.test( item.city))+(matcher.test( item.state))+(matcher.test( item.country));
+				          }) );
+					},
+	            	error: function(data){
+	            		console.clear();
+	            		$('#timezone1Span').html("city not found").css("color", "red");
+	            		$('#timezone1').removeClass("ui-autocomplete-loading");
+	            	}
+	            })
 			},
 			select: function( event, ui ) {
-				$( "#timezone1" ).val( ui.item.label );
-				$( "#timezone1-offset" ).val( ui.item.value);
-				return false;
-			},
-			change: function( event, ui ) {
-				$( "#timezone1" ).val( ui.item.label );
-				$( "#timezone1-offset" ).val( ui.item.value);
-				return false;
+				$( "#timezone1" ).val(ui.item.city);
+				zip=ui.item.zip;
+				event.preventDefault();
 			}
-	    });
-//	    .data( "ui-autocomplete" )._renderItem = function( ul, item ) 
-//	    {
-//	      return $( "<li>" )
-//	        .append( "<a>" + item.label + "<br>" + item.desc + "</a>" )
-//	        .appendTo( ul );
-//	    };
+		})
+	    .data( "ui-autocomplete" )._renderItem = function( ul, item ) 
+		    {
+		      return $( "<li>" )
+		        .append( "<a>"+item.city + "<i class='glyphicon bfh-flag-"+item.countryCode+" pull-right'></i><br>" + item.state+", "+item.country+ "</a></li>" )
+		        .appendTo( ul );
+		    };
 	    $( "#timezone2" ).autocomplete({
-			minLength: 2,
-			source:datalist,
-			focus: function( event, ui ) {
-				$( "#timezone2" ).val( ui.item.label );
-				$( "#timezone2-offset" ).val( ui.item.value );
-				return false;
+			minLength:3,
+			source:function (request, response) {
+				zip=null;
+	            var dataString={
+	            	term: $.ui.autocomplete.escapeRegex(request.term)
+	            };
+	            dataString=JSON.stringify(dataString);
+	            console.log($.ui.autocomplete.escapeRegex(request.term));
+	            $.ajax({
+					url: "timezonebycity",
+					type: "post",
+					dataType: "json",
+					contentType: "application/json",
+					data: dataString,
+					async: true,
+					cache: true,
+					processData:false,
+					success: function(data){
+						$('#timezone2Span').empty();
+						$('#timezone2').removeClass("ui-autocomplete-loading");
+						var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+				          response( $.grep( data, function( item ){
+				              return (matcher.test( item.city))+(matcher.test( item.state))+(matcher.test( item.country));
+				          }) );
+					},
+	            	error: function(data){
+	            		console.clear();
+	            		$('#timezone2Span').html("city not found").css("color", "red");
+	            		$('#timezone2').removeClass("ui-autocomplete-loading");
+	            	}
+	            })
 			},
 			select: function( event, ui ) {
-				$( "#timezone2" ).val( ui.item.label );
-				$( "#timezone2-offset" ).val( ui.item.value );
-				return false;
-			},
-			change: function( event, ui ) {
-				$( "#timezone2" ).val( ui.item.label );
-				$( "#timezone2-offset" ).val( ui.item.value);
-				return false;
+				$( "#timezone2" ).val(ui.item.city);
+				event.preventDefault();
 			}
-	    });
-//	    .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
-//	      return $( "<li>" )
-//	        .append( "<a>" + item.label + "<br>" + item.desc + "</a>" )
-//	        .appendTo( ul );
-//	    };
-	    
-	  });
+		})
+	    .data( "ui-autocomplete" )._renderItem = function( ul, item ) 
+		    {
+		      return $( "<li>" )
+		        .append( "<a>"+item.city + "<i class='glyphicon bfh-flag-"+item.countryCode+" pull-right'></i><br>" + item.state+", "+item.country+ "</a></li>" )
+		        .appendTo( ul );
+		    };
+	  
 	
 		function converter(src, dest){
 			var hour=$('#time'+src).val().split(':')[0];
@@ -103,6 +120,21 @@ $(document).ready(function(){
 				}
 				if(hour<10){
 					hour="0"+hour
+				}
+				if(date.getDate()==1)
+				{
+					$('#time'+src+'Span').empty();
+					$('#time'+dest+'Span').html("Today");
+				}
+				else if(date.getDate()==2)
+				{
+					$("#time"+src+"Span").empty();
+					$("#time"+dest+"Span").html("Tommorow");
+				}
+				else if(date.getDate()==31)
+				{
+					$("#time"+src+"Span").empty();
+					$("#time"+dest+"Span").html("YesterDay");
 				}
 				$('#time'+dest).val(hour+":"+min+":00");
 		//		if(hour==0){
@@ -128,16 +160,28 @@ $(document).ready(function(){
 			converter(2,1)
 		});
 		$('#timezone1').on( "autocompleteselect", function( event, ui ) {
-			converter(2,1);
+			$.ajax({
+				url: "/timezone?zipcode="+ui.item.zipCode,
+				dataType: "json",
+				success: function(data){
+					place=data.data;
+					$('#timezone1-offset').val(place[0].rawOffset);
+					converter(2,1);
+				}
+			});
 		});
 		$('#timezone2').on( "autocompleteselect", function( event, ui ) {
-			converter(1,2);
-		});
-		$('#timezone1').on( "autocompletefocus", function( event, ui ) {
-			converter(2,1);
-		});
-		$('#timezone2').on( "autocompletefocus", function( event, ui ) {
-			converter(1,2);
+			$.ajax({
+				url: "/timezone?zipcode="+ui.item.zipCode,
+				dataType: "json",
+				success: function(data){
+					place=data.data;
+					console
+					$('#timezone2-offset').val(place[0].rawOffset);
+					converter(1,2);
+				}
+			});
+			
 		});
 		$('#time1').focus();
 });

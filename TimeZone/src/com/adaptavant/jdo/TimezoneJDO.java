@@ -24,8 +24,6 @@ public class TimezoneJDO {
 	@Persistent
 	private String city;
 	
-	@Persistent
-	private String cityCode;
 	
 	@Persistent
 	private String state;
@@ -251,23 +249,7 @@ public class TimezoneJDO {
 		this.zipCode = zipCode;
 	}
 
-
-	/**
-	 * @return the cityCode
-	 */
-	public String getCityCode() {
-		return cityCode;
-	}
-
-
-	/**
-	 * @param cityCode the cityCode to set
-	 */
-	public void setCityCode(String cityCode) {
-		this.cityCode = cityCode;
-	}
-
-
+	
 	/**
 	 * @return the stateCode
 	 */
@@ -282,5 +264,4 @@ public class TimezoneJDO {
 	public void setStateCode(String stateCode) {
 		this.stateCode = stateCode;
 	}
-
 }

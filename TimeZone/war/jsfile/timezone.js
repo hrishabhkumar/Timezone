@@ -35,6 +35,7 @@ $(document).ready(function(){
 								}
 								else
 								{
+									console.log(listdata[i]);
 									output+='<option value="'+listdata[i].country+'">'+listdata[i].country+'</option>';
 								}
 								
@@ -76,7 +77,8 @@ $(document).ready(function(){
 					$('#result').removeClass('loader');
 					$('#resultHeader').html("<h1>Your timeZone Data:</h1>");
 					var output='<div class="form-horizontal col-lg-6">';
-					for (var i in timezonedata) {
+					for (var i in timezonedata) 
+					{
 						output+='<div class="form-group"><label class="col-sm-4 control-label ">timeZoneID:</label>';
 						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].timeZoneID+'</p></div></div>';
 						
@@ -94,7 +96,7 @@ $(document).ready(function(){
 						
 						output+='<div class="form-group"><label class="col-sm-4 control-label">City:</label>';
 						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].city+'</p></div></div>';
-
+						
 						output+='<div class="form-group"><label class="col-sm-4 control-label">Zip Code:</label>';
 						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].zipCode+'</p></div></div>';
 						
@@ -116,8 +118,8 @@ $(document).ready(function(){
 						output+='<div class="form-group"><label class="col-sm-4 control-label">Current UTC Time:</label>';
 						output+='<div class="col-sm-6"><p class="form-control-static" id="'+timezonedata[i].city+'raw"></p></div></div></div>';
 						
-						var rawOffset=parseInt(timezonedata[i].rawOffset)+data.currentTime;
-						var dstOffset=parseInt(timezonedata[i].dstOffset)+data.currentTime;
+						var rawOffset;
+						var dstOffset;
 						var clientDate=new Date();
 						var timeDiff=data.currentTime-clientDate.getTime();
 						rawOffset=parseInt(timezonedata[i].rawOffset)+timeDiff;
@@ -147,6 +149,8 @@ $(document).ready(function(){
 	dataString=JSON.stringify(dataString);
 	console.log(dataString);
 	ajax_call('country', dataString);
+	$('#state').html('');
+	$('#city').html('');
 	});
 	
 	//Getting State List
@@ -259,7 +263,7 @@ $(document).ready(function(){
 							$('#cityName').removeClass("ui-autocomplete-loading");
 							var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
 					          response( $.grep( data, function( item ){
-					              return (matcher.test( item.city))+(matcher.test( item.state))+(matcher.test( item.country));
+					              return (matcher.test( item.city ))+(matcher.test( item.state))+(matcher.test( item.country));
 					          }) );
 						},
 		            	error: function(data){
@@ -283,14 +287,14 @@ $(document).ready(function(){
 		    .data( "ui-autocomplete" )._renderItem = function( ul, item ) 
 		    {
 		      return $( "<li>" )
-		        .append( "<a>" + item.city + "<i class='glyphicon bfh-flag-"+item.countryCode+" pull-right'></i><br>" + item.state+", "+item.country+ "</a></li>" )
+		        .append( "<a>"+item.city + "<i class='glyphicon bfh-flag-"+item.countryCode+" pull-right'></i><br>" + item.state+", "+item.country+ "</a></li>" )
 		        .appendTo( ul );
 		    };
 		});
 		$('#cityName').on('autocompletefocus',function(event, ui){
 			$('#cityName').keyup(function(event){
 				if(event.which==27){
-					$( "#cityName" ).val( ui.item.city);
+					$( "#cityName" ).val(ui.item.city);
 					zip= ui.item.zipCode;
 					event.preventDefault();
 				}
