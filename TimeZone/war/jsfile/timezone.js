@@ -113,10 +113,10 @@ $(document).ready(function(){
 						output+='<div class="col-sm-6"><p class="form-control-static">'+timezonedata[i].dstOffset+'</p></div></div></div>';
 						
 						output+='<div class="form-horizontal col-lg-6 panel  panel-default"><div class="form-group"><label class="col-sm-4 control-label">Current DST Time:</label>';
-						output+='<div class="col-sm-6"><p class="form-control-static" id="'+timezonedata[i].city+'dst"></p></div></div>';
+						output+='<div class="col-sm-6"><p class="form-control-static" id="'+timezonedata[i].city+timezonedata[i].state+'dst"></p></div></div>';
 						
 						output+='<div class="form-group"><label class="col-sm-4 control-label">Current UTC Time:</label>';
-						output+='<div class="col-sm-6"><p class="form-control-static" id="'+timezonedata[i].city+'raw"></p></div></div></div>';
+						output+='<div class="col-sm-6"><p class="form-control-static" id="'+timezonedata[i].city+timezonedata[i].state+'raw"></p></div></div></div>';
 						
 						var rawOffset;
 						var dstOffset;
@@ -124,8 +124,8 @@ $(document).ready(function(){
 						var timeDiff=data.currentTime-clientDate.getTime();
 						rawOffset=parseInt(timezonedata[i].rawOffset)+timeDiff;
 						dstOffset=parseInt(timezonedata[i].dstOffset)+timeDiff;
-						output+='<script type="text/javascript">window.onload = date_time("'+timezonedata[i].city+'raw", parseInt('+rawOffset+'));</script>';
-						output+='<script type="text/javascript">window.onload = date_time("'+timezonedata[i].city+'dst", parseInt('+dstOffset+'));</script>';
+						output+='<script type="text/javascript">window.onload = date_time("'+timezonedata[i].city+timezonedata[i].state+'raw", parseInt('+rawOffset+'));</script>';
+						output+='<script type="text/javascript">window.onload = date_time("'+timezonedata[i].city+timezonedata[i].state+'dst", parseInt('+dstOffset+'));</script>';
 					}
 					$('#result').html(output);
 				}

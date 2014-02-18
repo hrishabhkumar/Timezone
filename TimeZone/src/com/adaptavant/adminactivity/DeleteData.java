@@ -14,6 +14,9 @@ import org.json.simple.JSONObject;
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.TimezoneJDO;
 import com.adaptavant.utilities.MCacheService;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
 /**
  * @author Hrishabh.Kumar
@@ -39,10 +42,15 @@ public class DeleteData {
 		try {
 		  @SuppressWarnings("unchecked")
 		  List<TimezoneJDO> results = (List<TimezoneJDO>) query.execute();
-		  if (!results.isEmpty()){
+		  if (!results.isEmpty())
+		  {
 			TimezoneJDO timeZoneJDO=results.get(0);
 			pm.deletePersistent(timeZoneJDO);
 			MCacheService.removeAll();
+			Queue queue = QueueFactory.getQueue("subscription-queue");
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "country"));
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "longAndLat"));
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "cityData"));
 			return "success";
 		 }
 		 else{

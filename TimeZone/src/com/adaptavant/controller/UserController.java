@@ -54,6 +54,7 @@ public class UserController
 	 * @return status of admin Action(update & delete)
 	 * This is mapping for admin action.(update and deletion)
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/admin", method=RequestMethod.POST)
 	public @ResponseBody String adminAction(@RequestBody String timezoneRequestData)
 	{
@@ -64,24 +65,56 @@ public class UserController
 			if(timezoneData.get("operationRequired").toString().equals("update"))
 			{
 				logger.info("inside update.");
-				JSONObject oldTimezoneData=(JSONObject) timezoneData.get("oldTimezoneData");
-				JSONObject newTimezoneData=(JSONObject) timezoneData.get("newTimezoneData");
+				JSONObject oldTimezoneData=(JSONObject) timezoneData.get("oldtimezonedata");
+				JSONObject newTimezoneData=(JSONObject) timezoneData.get("newtimezonedata");
 				UpdateData updateData=new UpdateData();
-				updateData.changeData(oldTimezoneData, newTimezoneData);
+				String update=updateData.changeData(oldTimezoneData, newTimezoneData);
+				if(update.equals("success")){
+					responseJson=new JSONObject();
+					responseJson.put("status", "success");
+					return responseJson.toJSONString();
+				}
+				else{
+					responseJson=new JSONObject();
+					responseJson.put("status", "failed");
+					return responseJson.toJSONString();
+				}
+				
 			}
 			else if(timezoneData.get("operationRequired").toString().equals("delete"))
 			{
 				logger.info("inside delete.");
 				JSONObject TimezoneData=(JSONObject) timezoneData.get("timezoneData");
 				DeleteData deleteData=new DeleteData();
-				deleteData.deleteData(TimezoneData);
+				String delete=deleteData.deleteData(TimezoneData);
+				if(delete.equals("success")){
+					responseJson=new JSONObject();
+					responseJson.put("status", "success");
+					return responseJson.toJSONString();
+				}
+				else{
+					responseJson=new JSONObject();
+					responseJson.put("status", "failed");
+					return responseJson.toJSONString();
+				}
+				
+			}
+			else{
+				responseJson=new JSONObject();
+				responseJson.put("status", "failed");
+				responseJson.put("msg", "required operation is not mentioned");
+				return responseJson.toJSONString();
 			}
 		} catch (Exception e) 
 		{
+			e.printStackTrace();
 			logger.severe("exception in admin Action.");
-			return null;
+			responseJson=new JSONObject();
+			responseJson.put("status", "failed");
+			responseJson.put("msg", "please follow required format");
+			return responseJson.toJSONString();
 		}
-		return "admin";
+		
 	}
 	/**
 	 * 

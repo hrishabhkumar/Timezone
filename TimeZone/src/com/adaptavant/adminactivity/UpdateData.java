@@ -13,8 +13,10 @@ import org.json.simple.JSONObject;
 
 import com.adaptavant.jdo.PMF;
 import com.adaptavant.jdo.TimezoneJDO;
-import com.adaptavant.timezone.services.DataListProvider;
 import com.adaptavant.utilities.MCacheService;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
 /**
  * @author Hrishabh.Kumar
@@ -52,7 +54,8 @@ public class UpdateData {
 		  @SuppressWarnings("unchecked")
 		  List<TimezoneJDO> results = (List<TimezoneJDO>) query.execute();
 		  
-		  if (!results.isEmpty()){
+		  if (!results.isEmpty())
+		  {
 			TimezoneJDO timeZoneJDO=results.get(0);
 			timeZoneJDO.setCity(city);
 			timeZoneJDO.setCountry(country);
@@ -63,17 +66,19 @@ public class UpdateData {
 			timeZoneJDO.setState(state);
 			timeZoneJDO.setTimeZoneId(timeZoneID);
 			timeZoneJDO.setTimeZoneName(timeZoneName);
-			System.out.println(results);
 			MCacheService.removeAll();
-			DataListProvider dld=new DataListProvider();
-			dld.getCountryList(1000, null);
-			 return "success";
+			Queue queue = QueueFactory.getQueue("subscription-queue");
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "country"));
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "longAndLat"));
+			queue.add(TaskOptions.Builder.withUrl("/list").param("limit", "1000").param("list", "cityData"));
+			return "success";
 		 }
 		 else{
 			 return "failed";
 		  }
 		} 
 		catch(Exception e){
+			e.printStackTrace();
 		  return "failed";
 		}
 			

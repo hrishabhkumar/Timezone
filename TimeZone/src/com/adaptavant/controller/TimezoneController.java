@@ -503,8 +503,6 @@ public class TimezoneController
 		LongLatDataProvider longLatDataProvider=null;
 		int limit=Integer.parseInt(req.getParameter("limit"));
 		String cursorString=req.getParameter("cursorString");
-		
-		
 		if(req.getParameter("list").equals("country"))
 		{
 			 dataListProvider=new DataListProvider();

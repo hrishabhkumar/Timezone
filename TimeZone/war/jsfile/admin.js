@@ -27,7 +27,15 @@ $(document).ready(function(){
 						if(listdata.length!=0){
 							var output='<option selected=true value=0>select '+name+'</option>';
 							for (var i in listdata) {
-								output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
+								if(typeof(listdata[i])=='string')
+								{
+									output+='<option value="'+listdata[i]+'">'+listdata[i]+'</option>';
+								}
+								else
+								{
+									console.log(listdata[i]);
+									output+='<option value="'+listdata[i].country+'">'+listdata[i].country+'</option>';
+								}
 							}
 							$(id).html(output);
 							$('#seachButton').attr("disabled",false)
@@ -211,7 +219,7 @@ $(document).ready(function(){
 					"city":$('#city').val()	
 			};
 			var dataString={
-				"opreq":"update",
+				"operationRequired":"update",
 				"oldtimezonedata": oldtimezonedata,
 				"newtimezonedata": newtimezonedata
 			};
@@ -226,12 +234,57 @@ $(document).ready(function(){
 				cache: false,
 				processData:false,
 				success: function(data){
-					
+					if(data.status=="success"){
+						alert("Data updated successfully");
+					}
+					else{
+						alert("Data not updated");
+					}
+				},
+				error: function(data){
+					alert("there is some error");
 				}
 			});
 		});
 		$('#result').on('click', '#delete', function() {
-			alert("delete");
+			if(confirm("Are you sure to delete the data??"))
+			{
+				var timezonedata={
+						"country": $('#country').val(),
+						"state":$('#state').val(),
+						"city":$('#city').val()	
+				};
+				var dataString={
+					"operationRequired":"delete",
+					"timezoneData": timezonedata,
+				};
+				dataString=JSON.stringify(dataString);
+				$.ajax({
+					url: "admin",
+					type: "post",
+					dataType: "json",
+					contentType: "application/json",
+					data: dataString,
+					async: true,
+					cache: false,
+					processData:false,
+					success: function(data){
+						if(data.status=="success"){
+							alert("Data deleted successfully");
+							window.location.assign("/admin");
+						}
+						else{
+							alert("Data not deleted");
+							window.location.assign("/admin");
+						}
+					},
+					error: function(data){
+						alert("there is some error");
+						window.location.assign("/admin");
+					}
+				});
+			}
+			
 		});
 	});
 	
